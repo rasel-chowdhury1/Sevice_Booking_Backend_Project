@@ -1,0 +1,1 @@
+export const isPaymentLinkStatus = ['', 'pending', 'submitted', 'approved'];
