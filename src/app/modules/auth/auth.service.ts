@@ -70,7 +70,7 @@ const login = async (payload: TLogin) => {
     accessToken,
     refreshToken,
     support: {
-      email: supportPhone,
+      email: supportEmail,
       phone: supportPhone
     }
   };
