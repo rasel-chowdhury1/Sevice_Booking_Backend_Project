@@ -49,6 +49,20 @@ userRoutes
     userController.getNearestGuidesAndEvents,
   )
 
+  .get("/isLookingForGuide", 
+    auth(USER_ROLE.SEEKER),
+    userController.getIsLookingForGuide
+  )
+
+  .get("/isLookingGuideSeekers",
+    auth(USER_ROLE.GUIDE),
+    userController.getIslookingGuideOfSeekers
+  )
+
+  .patch("/updateIsLookingForGuide",
+    auth(USER_ROLE.SEEKER),
+    userController.updateIsLookingForGuide
+  )
   // ============= [ dashboard routes access only admin start ] ==============
 
   // all users route
@@ -56,9 +70,15 @@ userRoutes
 
   // all users overview ddat of seeker, GUIDE and recent users
   .get(
-    '/all-user-overview',
+    '/all-user-Statistics',
     auth(USER_ROLE.ADMIN),
-    userController.getUserOverview,
+    userController.getUserStatistics,
+  )
+  // all users overview ddat of seeker, GUIDE and recent users
+  .get(
+    '/all-year-user-overview',
+    auth(USER_ROLE.ADMIN),
+    userController.getYearlyUserOverview,
   )
 
   // verify user by admin
@@ -68,15 +88,36 @@ userRoutes
     userController.verifyUserByAdmin,
   )
 
-  .get('/role/:role', userController.getUsersByRole)
+   // block user by admin
+   .patch(
+    '/block/:userId',
+    auth(USER_ROLE.ADMIN),
+    userController.blockUserByAdmin,
+  )
 
-  .get('/all-users-count', userController.getAllUserCount)
-  .get('/all-seekers-count', userController.getAllSeekerCount)
+  // block user by admin
+  .patch(
+    '/unBlock/:userId',
+    auth(USER_ROLE.ADMIN),
+    userController.unBlockUserByAdmin,
+  )
+
+
+
+  .get('/role/:role', userController.getUsersByRole)
   .get('/all-plusone-count', userController.getAllPlusOneCount)
 
   .get('/all-users-rasio', userController.getAllUserRasio)
 
+  
+  .get(
+    "/wallet", 
+    auth(USER_ROLE.SEEKER, USER_ROLE.GUIDE, USER_ROLE.ADMIN), 
+    userController.getUserWallet
+  )
+  
   .get('/:id', userController.getUserById)
+
 
   // .patch(
   //   '/update-my-profile',
@@ -113,3 +154,13 @@ userRoutes
   );
 
 // export default userRoutes;
+
+
+
+
+
+
+
+
+// .get('/all-users-count', userController.getAllUserCount)
+// .get('/all-seekers-count', userController.getAllSeekerCount)

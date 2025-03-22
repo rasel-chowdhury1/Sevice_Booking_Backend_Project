@@ -33,6 +33,8 @@ const login = catchAsync(async (req: Request, res: Response) => {
     cookieOptions.sameSite = 'none';
   }
 
+
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -69,6 +71,7 @@ const forgotPassword = catchAsync(async (req: Request, res: Response) => {
   const { email, phoneNumber } = req.body;
 
   console.log({email})
+  console.log({phoneNumber})
 
   let result;
   

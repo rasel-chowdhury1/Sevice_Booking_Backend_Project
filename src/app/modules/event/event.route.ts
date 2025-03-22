@@ -13,11 +13,7 @@ export const eventRoutes = Router();
 // Create event route
 eventRoutes.post(
   '/create',
-  auth(
-    // USER_ROLE.SEEKER,
-    USER_ROLE.ADMIN,
-    USER_ROLE.GUIDE,
-  ),
+  auth(USER_ROLE.SEEKER, USER_ROLE.ADMIN, USER_ROLE.GUIDE),
   // verifyAccess(USER_ROLE.GUIDE),
   eventUpload.fields([
     { name: 'descriptionImage', maxCount: 1 }, // For the description Image
@@ -50,12 +46,11 @@ eventRoutes.get(
   eventController.getAllEvents,
 );
 
-
-
 // Delete event route
 eventRoutes.delete(
   '/delete/:eventId',
-  auth(USER_ROLE.ADMIN), // Only admin can delete events
+  // auth(USER_ROLE.ADMIN), // Only admin can delete events
+  auth(USER_ROLE.GUIDE, USER_ROLE.SEEKER, USER_ROLE.ADMIN), // Only admin can delete events
   eventController.deleteEvent,
 );
 

@@ -9,7 +9,15 @@ const mySubscriptionSchema = new Schema<IMySubscription>({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Subscription",
     required: true,
-  }
+  },
+  isExpired: {
+    type: Boolean,
+    default: false
+  },
+  isNotified: {
+    type: Boolean,
+    default: false
+  },
 });
 
 

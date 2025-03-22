@@ -18,7 +18,7 @@ notificationRoutes
 notificationRoutes
     .get(
         "/myNotifactions", 
-        auth(USER_ROLE.GUIDE,USER_ROLE.SEEKER),
+        auth(USER_ROLE.GUIDE,USER_ROLE.SEEKER, USER_ROLE.ADMIN),
         notificationController.getNotificationsByRecipient
     );
 

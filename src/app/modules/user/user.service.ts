@@ -12,6 +12,7 @@ import { generateOptAndExpireTime } from '../otp/otp.utils';
 import { USER_ROLE } from './user.constants';
 import { DeleteAccountPayload, TUser, TUserCreate } from './user.interface';
 import { User } from './user.models';
+import Booking from '../booking/booking.model';
 
 export type IFilter = {
   searchTerm?: string;
@@ -67,7 +68,7 @@ const createUserToken = async (payload: TUserCreate) => {
     });
   }
 
-  const otpBody: TUserCreate = {
+  const otpBody: Partial<TUserCreate> = {
     email,
     fullName,
     password,
@@ -76,14 +77,14 @@ const createUserToken = async (payload: TUserCreate) => {
     about, // Include `about` directly
 
     // Provide default values for required properties
-    notificationSettings: {
-      generalNotification: true,
-      subscription: true,
-    },
-    privacySettings: {
-      profileView: 'public',
-      contactPermission: 'anyone',
-    },
+    // notificationSettings: {
+    //   generalNotification: true,
+    //   subscription: true,
+    // },
+    // privacySettings: {
+    //   profileView: 'public',
+    //   contactPermission: 'anyone',
+    // },
   };
 
   if (about) {
@@ -284,6 +285,18 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
 
 // const updateUserSettings = async (id: string, payload: any) => {}
 
+
+const getUserWallet = async (id: string) => {
+  console.log('=== get specific user id ====>>> ', id);
+  const result = await User.findById(id).select("wallet");
+
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  
+  return result;
+};
+
 // ============= get Nearest guides functionlity start ================
 const getNearestGuides = async (userId: string, projects?: {}) => {
   try {
@@ -320,6 +333,15 @@ const getNearestGuides = async (userId: string, projects?: {}) => {
       seekerInterestsArray,
     });
 
+    // 3️⃣ Find guides who have been booked by this seeker with status NOT 'done' or 'cancelled'
+    const activeBookings = await Booking.find({
+      user_id: userId,
+      status: { $nin: ['done', 'cancelled'] }, // Exclude 'done' & 'cancelled' bookings
+    }).distinct('guide_id'); // Get unique guide IDs
+    
+
+    console.log({activeBookings})
+
     // 3️⃣ Query nearest guides
     const guides = await User.aggregate([
       {
@@ -340,6 +362,8 @@ const getNearestGuides = async (userId: string, projects?: {}) => {
           isActive: true,
           isDeleted: false,
           isBlocked: false,
+          adminVerified: true,
+          _id: { $nin: activeBookings },
           ...(seekerInterestsArray.length > 0 && {
             interests: { $in: seekerInterestsArray },
           }), // ✅ Filter by shared interests
@@ -441,6 +465,7 @@ const getNearestSeekers = async (userId: string, projects?: {}) => {
           isActive: true,
           isDeleted: false,
           isBlocked: false,
+          adminVerified: true,
           ...(seekerInterestsArray.length > 0 && {
             interests: { $in: seekerInterestsArray },
           }), // ✅ Filter by shared interests
@@ -486,6 +511,109 @@ const getNearestSeekers = async (userId: string, projects?: {}) => {
 };
 // ============= get Nearest Seeker functionlity end ================
 
+
+// ============= get which seeker want is looking for guide  functionlity start ================
+const getIslookingGuideOfSeekers = async (userId: string, projects?: {}) => {
+  try {
+    // 1️⃣ Check if the seeker exists
+    const plusone = await User.findById(userId);
+
+    if (!plusone) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Seeker not found');
+    }
+
+    // 2️⃣ Extract location & interests
+    const { location, interests } = plusone;
+
+    if (
+      !location ||
+      !location.coordinates ||
+      location.coordinates.length !== 2
+    ) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Seeker location is missing or invalid',
+      );
+    }
+
+    const [longitude, latitude] = location.coordinates;
+
+    // ✅ Safe handling of `interests` to prevent `undefined` error
+    const seekerInterestsArray =
+      Array.isArray(interests) && interests.length > 0 ? interests : [];
+
+    console.log('==== Seeker Location & Interests ===', {
+      longitude,
+      latitude,
+      seekerInterestsArray,
+    });
+
+    // 3️⃣ Query nearest guides
+    const guides = await User.aggregate([
+      {
+        $geoNear: {
+          near: {
+            type: 'Point',
+            coordinates: [longitude, latitude],
+          },
+          // key: "location",
+          distanceField: 'distance',
+          maxDistance: 5000, // ✅ 5km max distance filter
+          spherical: true,
+        },
+      },
+      {
+        $match: {
+          role: 'seeker', // ✅ Only guides
+          isActive: true,
+          isDeleted: false,
+          isBlocked: false,
+          isLookingGuide: true,
+          ...(seekerInterestsArray.length > 0 && {
+            interests: { $in: seekerInterestsArray },
+          }), // ✅ Filter by shared interests
+        },
+      },
+      {
+        $sort: { rating: -1 }, // ✅ Sort by highest rating
+      },
+      {
+        $addFields: {
+          type: 'user', // ✅ Add `type: user` to each document
+        },
+      },
+      {
+        $project: projects || {
+          image: 1,
+          fullName: 1,
+          email: 1,
+          phone: 1,
+          location: 1,
+          address: 1,
+          about: 1,
+          rating: 1,
+          interests: 1,
+          distance: 1, // ✅ Return distance in meters
+          photos: 1,
+          adminVerified: 1,
+          myFee: 1,
+        },
+      },
+    ]);
+
+    return guides;
+  } catch (error) {
+    console.error('Error fetching nearest guides:', error);
+
+    // ✅ Ensure error is properly typed before accessing `message`
+    const errorMessage =
+      error instanceof Error ? error.message : 'An unknown error occurred';
+
+    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, errorMessage);
+  }
+};
+// ============= get which seeker want is looking for guide  functionlity  end ================
+
 const getAllUserQuery = async (query: Record<string, unknown>) => {
   console.log('========>>>>>::', typeof query.isSubcription);
   // Convert 'isSubcription' query parameter to a boolean
@@ -527,12 +655,16 @@ const getAllPlusOneCount = async () => {
   return allUserCount;
 };
 
-const getUserOverview = async () => {
+const getUserStatistics = async (userId?:string) => {
   try {
+
+    // Define the filter to exclude the given userId
+    const filter = userId ? { _id: { $ne: userId } } : {};
+
     // Fetch total user count
     const allUserCount = await User.countDocuments();
 
-    // Fetch seekers and plus one users
+    // Fetch seekers and guides
     const allSeekerCount = await User.countDocuments({
       role: USER_ROLE.SEEKER,
     });
@@ -540,38 +672,16 @@ const getUserOverview = async () => {
       role: USER_ROLE.GUIDE,
     });
 
-    // Fetch user growth over time (monthly count)
-    const userOverview = await User.aggregate([
-      {
-        $group: {
-          _id: { $month: '$createdAt' },
-          count: { $sum: 1 },
-        },
-      },
-      { $sort: { _id: 1 } },
-    ]);
 
-    // Fetch income statistics (monthly income)
-    // const incomeOverview = await Payment.aggregate([
-    //   {
-    //     $group: {
-    //       _id: { $month: "$createdAt" },
-    //       totalIncome: { $sum: "$amount" }
-    //     }
-    //   },
-    //   { $sort: { _id: 1 } }
-    // ]);
+
 
     // Fetch recent users
-    const recentUsers = await User.find({}).sort({ createdAt: -1 }).limit(6);
-    // .select('fullName gender email phone role userType');
+    const recentUsers = await User.find(filter).sort({ createdAt: -1 }).limit(6);
 
     return {
       totalUsers: allUserCount,
       seekers: allSeekerCount,
       guides: allPlusoneCount,
-      userOverview,
-      // incomeOverview,
       recentUsers,
     };
   } catch (error) {
@@ -580,7 +690,116 @@ const getUserOverview = async () => {
   }
 };
 
+const getYearlyUserOverview = async (year:any) => {
+  try {
+
+    const userOverview = await User.aggregate([
+      {
+        $match: {
+          createdAt: { 
+            $gte: new Date(`${year}-01-01`), 
+            $lt: new Date(`${year + 1}-01-01`) 
+          }, // Filter by year
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$createdAt" }, // Group by month
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { _id: 1 }, // Sort by month (ascending)
+      },
+    ]);
+    
+    // Define all 12 months with default counts
+    const months = [
+      { _id: 1, monthName: "January", count: 0 },
+      { _id: 2, monthName: "February", count: 0 },
+      { _id: 3, monthName: "March", count: 0 },
+      { _id: 4, monthName: "April", count: 0 },
+      { _id: 5, monthName: "May", count: 0 },
+      { _id: 6, monthName: "June", count: 0 },
+      { _id: 7, monthName: "July", count: 0 },
+      { _id: 8, monthName: "August", count: 0 },
+      { _id: 9, monthName: "September", count: 0 },
+      { _id: 10, monthName: "October", count: 0 },
+      { _id: 11, monthName: "November", count: 0 },
+      { _id: 12, monthName: "December", count: 0 },
+    ];
+    
+    // Merge aggregation results into the default array
+    const finalResult = months.map((month) => {
+      const found = userOverview.find((item) => item._id === month._id);
+      return found ? { ...month, count: found.count } : month;
+    });
+
+    return {userOverview: finalResult};
+  } catch (error) {
+    console.error('Error fetching dashboard overview:', error);
+    throw new Error('Error fetching dashboard data.');
+  }
+};
+
+
+
+
+// const getUserOverview = async () => {
+//   try {
+//     // Fetch total user count
+//     const allUserCount = await User.countDocuments();
+
+//     // Fetch seekers and plus one users
+//     const allSeekerCount = await User.countDocuments({
+//       role: USER_ROLE.SEEKER,
+//     });
+//     const allPlusoneCount = await User.countDocuments({
+//       role: USER_ROLE.GUIDE,
+//     });
+
+//     // Fetch user growth over time (monthly count)
+//     // const userOverview = await User.aggregate([
+//     //   {
+//     //     $group: {
+//     //       _id: { $month: '$createdAt' },
+//     //       count: { $sum: 1 },
+//     //     },
+//     //   },
+//     //   { $sort: { _id: 1 } },
+//     // ]);
+
+//     // Fetch income statistics (monthly income)
+//     // const incomeOverview = await Payment.aggregate([
+//     //   {
+//     //     $group: {
+//     //       _id: { $month: "$createdAt" },
+//     //       totalIncome: { $sum: "$amount" }
+//     //     }
+//     //   },
+//     //   { $sort: { _id: 1 } }
+//     // ]);
+
+//     // Fetch recent users
+//     const recentUsers = await User.find({}).sort({ createdAt: -1 }).limit(6);
+//     // .select('fullName gender email phone role userType');
+
+//     return {
+//       totalUsers: allUserCount,
+//       seekers: allSeekerCount,
+//       guides: allPlusoneCount,
+//       userOverview,
+//       // incomeOverview,
+//       recentUsers,
+//     };
+//   } catch (error) {
+//     console.error('Error fetching dashboard overview:', error);
+//     throw new Error('Error fetching dashboard data.');
+//   }
+// };
+
 const getAllUserRatio = async (year: number) => {
+
   const startOfYear = new Date(year, 0, 1); // January 1st of the given year
   const endOfYear = new Date(year + 1, 0, 1); // January 1st of the next year
 
@@ -638,7 +857,7 @@ const getAllUserRatio = async (year: number) => {
 };
 
 const getUserById = async (id: string) => {
-  console.log('=== get specific user id ==== ', id);
+  console.log('=== get specific user id ====>>> ', id);
   const result = await User.findById(id);
   if (!result) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
@@ -724,7 +943,7 @@ const blockedUser = async (id: string) => {
   if (!singleUser) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
-  if (!singleUser.isActive) {
+  if (singleUser.isBlocked) {
     throw new AppError(httpStatus.NOT_FOUND, 'User Already Blocked');
   }
   // let status;
@@ -734,16 +953,49 @@ const blockedUser = async (id: string) => {
   // } else {
   //   status = true;
   // }
-  let status = !singleUser.isActive;
+  let status = !singleUser.isBlocked;
   console.log('status', status);
   const user = await User.findByIdAndUpdate(
     id,
-    { isActive: status },
+    { isBlocked: status },
     { new: true },
   );
 
   if (!user) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'user deleting failed');
+    throw new AppError(httpStatus.BAD_REQUEST, 'user blocked failed');
+  }
+
+  return user;
+};
+
+const unBlockedUser = async (id: string) => {
+  const singleUser = await User.IsUserExistById(id);
+
+  if (!singleUser) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  if (!singleUser.isBlocked) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User Already unBlocked');
+  }
+  // let status;
+
+  // if (singleUser?.isActive) {
+  //   status = false;
+  // } else {
+  //   status = true;
+  // }
+
+  let status = !singleUser.isBlocked;
+  console.log('status', status);
+  const user = await User.findByIdAndUpdate(
+    id,
+    { isBlocked: status },
+    { new: true },
+  );
+
+  if (!user) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'user blocked failed');
   }
 
   return user;
@@ -761,10 +1013,14 @@ export const userService = {
   deleteMyAccount,
   verifyUserByAdmin,
   blockedUser,
+  unBlockedUser,
   getAllUserQuery,
   getAllUserCount,
   getAllSeekerCount,
   getAllPlusOneCount,
   getAllUserRatio,
-  getUserOverview,
+  getUserStatistics,
+  getYearlyUserOverview,
+  getIslookingGuideOfSeekers,
+  getUserWallet
 };

@@ -8,7 +8,7 @@ const userSchema = new Schema<TUser>(
   {
     image: {
       type: String,
-      default: '/uploads/profile/default-user.jpg',
+      default: '',
     },
     fullName: {
       type: String,
@@ -28,6 +28,10 @@ const userSchema = new Schema<TUser>(
       required: true,
       select: false,
     },
+    phoneCountryCode: {
+      type: String,
+      default: '',
+    },
     phone: {
       type: String,
       default: '',
@@ -39,7 +43,7 @@ const userSchema = new Schema<TUser>(
     gender: {
       type: String,
       enum: ["Male", "Female", "Others"],
-      defult: "Male"
+      default: "Male"
     },
     document: {
         type: String,
@@ -101,28 +105,28 @@ const userSchema = new Schema<TUser>(
       type: Number,
       default: 0
     },
-    notificationSettings: {
-      generalNotification: {
-          type: Boolean,
-          default: true,
-      },
-      subscription: {
-          type: Boolean,
-          default: false,
-      },
-    },
-    privacySettings: {
-      profileView: {
-          type: String,
-          enum: ["public", "private"],
-          default: "public",
-      },
-      contactPermission: {
-          type: String,
-          enum: ["anyone", "verifiedUsers"],
-          default: "anyone",
-      },
-    },
+    // notificationSettings: {
+    //   generalNotification: {
+    //       type: Boolean,
+    //       default: true,
+    //   },
+    //   subscription: {
+    //       type: Boolean,
+    //       default: false,
+    //   },
+    // },
+    // privacySettings: {
+    //   profileView: {
+    //       type: String,
+    //       enum: ["public", "private"],
+    //       default: "public",
+    //   },
+    //   contactPermission: {
+    //       type: String,
+    //       enum: ["anyone", "verifiedUsers"],
+    //       default: "anyone",
+    //   },
+    // },
     adminVerified: {
       type: Boolean,
       default: false
@@ -143,7 +147,40 @@ const userSchema = new Schema<TUser>(
       type: Boolean,
       default: false
     },
-    myFee: [{ day: { type: Number }, amount: { type: Number } }], 
+    myFee: { day: { type: Number }, amount: { type: Number } }, 
+    isLookingGuide: {
+      type: Boolean,
+      default: false
+    },
+    // Add the wallet and transaction fields
+    wallet: {
+      balance: {
+        type: Number,
+        default: 0,
+      },
+      transactions: [
+        {
+          type: {
+            type: String,
+            enum: ['deposit', 'payment', 'withdrawal', 'refund'],
+            required: true,
+          },
+          amount: {
+            type: Number,
+            required: true,
+          },
+          referenceId: {
+            type: Schema.Types.ObjectId,
+            required: true,
+            refPath: 'type',
+          },
+          date: {
+            type: Date,
+            default: Date.now,
+          },
+        },
+      ],
+    },
   },
   {
     timestamps: true,
@@ -206,6 +243,8 @@ userSchema.statics.isUserExist = async function (email: string) {
   return await User.findOne({ email: email }).select('+password');
 };
 
+
+
 userSchema.statics.isUserActive = async function (email: string) {
   return await User.findOne({
     email: email,
@@ -213,6 +252,10 @@ userSchema.statics.isUserActive = async function (email: string) {
     isActive: true,
   }).select('+password');
 };
+
+userSchema.statics.isLookingForGuide = async function(id: string){
+  return await User.findById(id).select("")
+}
 
 userSchema.statics.IsUserExistById = async function (id: string) {
   return await User.findById(id).select('+password');

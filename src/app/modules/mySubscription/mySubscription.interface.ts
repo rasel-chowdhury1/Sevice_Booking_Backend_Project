@@ -6,4 +6,6 @@ export interface IMySubscription {
   user: ObjectId;
   expiryDate: Date;
   subscription?: ObjectId; 
+  isExpired?: boolean;
+  isNotified?: boolean;
 }

@@ -14,7 +14,7 @@ const notificationSchema: Schema = new Schema<INotification>({
     }, // Reference to the User model
     type: {
         type: String,
-        enum: ["info", "success", "error", "warning", "acceptEndRequest", "endRequest","review", "calender"],
+        enum: ["info", "success", "error", "warning", "acceptEndRequest", "endRequest","review", "calender", "report", "refund"],
         required: true,
     }, // Notification type
     title: {

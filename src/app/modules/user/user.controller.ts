@@ -92,6 +92,19 @@ const getUsersByRole = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getUserWallet = catchAsync(async (req: Request, res: Response) => {
+  const {userId} = req.user;
+
+  console.log("user id ->>>>>> ",{userId})
+  const result = await userService.getUserWallet(userId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `User wallet fetched successfully`,
+    data: result,
+  });
+});
+
 const verifyUserByAdmin = catchAsync(async (req: Request, res: Response) => {
   
   const adminId = req.user.userId;
@@ -104,6 +117,35 @@ const verifyUserByAdmin = catchAsync(async (req: Request, res: Response) => {
     statusCode: httpStatus.OK,
     success: true,
     message: `User verified successfully`,
+    data: result,
+  });
+});
+
+const blockUserByAdmin = catchAsync(async (req: Request, res: Response) => {
+  
+  const { userId } = req.params;
+  console.log({ userId });
+
+  const result = await userService.blockedUser(userId);
+  
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `User verified successfully`,
+    data: result,
+  });
+});
+
+const unBlockUserByAdmin = catchAsync(async (req: Request, res: Response) => {
+  
+  const { userId } = req.params;
+
+  const result = await userService.unBlockedUser(userId);
+  
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `User unBlocked successfully`,
     data: result,
   });
 });
@@ -125,9 +167,18 @@ const getNearestGuidesAndEvents = catchAsync(
     console.log('======= user data ====>>>>>> ', req.user);
     const { userId, role } = req.user;
     let users;
+    let seekers = null;
     let events;
     if (role === 'seeker') {
       users = await userService.getNearestGuides(userId, {
+        image: 1,
+        fullName: 1,
+        address: 1,
+        location: 1,
+        role: 1,
+        type: 1,
+      });
+      seekers = await userService.getNearestSeekers(userId, {
         image: 1,
         fullName: 1,
         address: 1,
@@ -164,10 +215,53 @@ const getNearestGuidesAndEvents = catchAsync(
       statusCode: httpStatus.OK,
       success: true,
       message: `Nearest users and events fetched successfully`,
-      data: { users, events },
+      data: { users, seekers, events },
     });
   },
 );
+
+const getIsLookingForGuide  = catchAsync(async (req: Request, res: Response) => {
+  const {userId} = req.user
+  const result = await User.findById(userId).select("isLookingGuide");
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `User fetched successfully`,
+    data: result,
+  });
+});
+
+const getIslookingGuideOfSeekers  = catchAsync(async (req: Request, res: Response) => {
+  const {userId} = req.user
+  const result = await userService.getIslookingGuideOfSeekers(userId)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `IsLookingGuide seekers fetched successfully`,
+    data: result,
+  });
+});
+
+const updateIsLookingForGuide = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = req.user;
+  const { isLookingGuide } = req.body; // Extract the isLookingForGuide value from the request body
+
+  // Update the user's isLookingForGuide field
+  const result = await User.findByIdAndUpdate(
+    userId,
+    { isLookingGuide: isLookingGuide }, // Ensure the field name matches
+    { new: true } // Return the updated user document
+  ).select("isLookingGuide"); // Select only the field you're updating
+
+  // Send the response with the updated field
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `IsLookingForGuide status updated successfully`,
+    data: result,
+  });
+});
+
 
 // rest >...............
 
@@ -232,14 +326,43 @@ const getAllPlusOneCount = catchAsync(async (req, res) => {
   });
 });
 
-const getUserOverview = catchAsync(async (req, res) => {
-  const result = await userService.getUserOverview();
+
+const getUserStatistics = catchAsync(async (req, res) => {
+  console.log("get all user overviewo _>>>> ");
+  const {userId} = req.user;
+  const result = await userService.getUserStatistics();
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     data: result,
     message: 'All User Count successful!!',
+  });
+});
+
+const getYearlyUserOverview = catchAsync(async (req, res) => {
+  console.log("get all user overviewo _>>>> ");
+
+  // Default to the current year if the 'year' query parameter is not provided
+  const year = req.query.year ? parseInt(req.query.year as string) : new Date().getFullYear();
+  
+  // Ensure the year is valid
+  if (isNaN(year)) {
+    sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: 'Invalid year parameter.',
+      data: null,
+    });
+  }
+
+  const result = await userService.getYearlyUserOverview(year);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    data: result,
+    message: 'All user overview...',
   });
 });
 
@@ -280,16 +403,20 @@ const getUserById = catchAsync(async (req: Request, res: Response) => {
 
 const getMyProfile = catchAsync(async (req: Request, res: Response) => {
   const result = await userService.getUserById(req?.user?.userId);
+
+  
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'profile fetched successfully',
-    data: result,
+    data: {result, support:{email:"support@gmail.com", phone: "01855859847"}},
   });
 });
 
 const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
   console.log('====== req files data ======', req.files);
+  console.log('====== req body data ======', req.body);
+
   // Check if there are uploaded files
   if (req.files) {
     try {
@@ -376,5 +503,12 @@ export const userController = {
   getAllPlusOneCount,
   getAllUserRasio,
   getMentor,
-  getUserOverview,
+  getUserStatistics,
+  getYearlyUserOverview,
+  getIsLookingForGuide,
+  updateIsLookingForGuide,
+  getIslookingGuideOfSeekers,
+  getUserWallet,
+  blockUserByAdmin,
+  unBlockUserByAdmin
 };

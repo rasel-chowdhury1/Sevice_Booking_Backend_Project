@@ -1,6 +1,6 @@
 import { Document, ObjectId } from "mongoose";
 
-export type TNotificationType = "info" | "success" | "error" | "warning" | "endRequest" | "review" | "calender";
+export type TNotificationType = "info" | "success" | "error" | "warning" | "endRequest" | "review" | "calender" | "report" | "refund";
 
 export interface INotification extends Document {
     user_id: string | ObjectId; // User who will sent the notification

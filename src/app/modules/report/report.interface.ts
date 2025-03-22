@@ -5,4 +5,6 @@ export interface IReport {
     userId?: ObjectId; // Reference to the user's ID
     reportId?: ObjectId; // Reference to the report user's ID (optional for Seeker's first payment)
     comment? : string;
+    isWarned: boolean;
+    isBlocked: boolean;
   }

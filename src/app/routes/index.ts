@@ -16,6 +16,9 @@ import { faqRoutes } from '../modules/faq/faq.route';
 import { privacyPolicyRoutes } from '../modules/privacyPolicy/privacyPolicy.route';
 import { ContactUsRoutes } from '../modules/contactUs/contactus.route';
 import { notificationRoutes } from '../modules/notification/notification.route';
+import { withdrawRequestRoutes } from '../modules/WithdrawRequest/withdrawRequest.route';
+import { paymentRoutes } from '../modules/payment/payment.route';
+import { settingsRoutes } from '../modules/setting/setting.route';
 
 const router = Router();
 
@@ -81,8 +84,20 @@ const moduleRoutes = [
     route: subcriptionPaymentRoutes,
   },
   {
+    path: '/payments',
+    route: paymentRoutes,
+  },
+  {
+    path: "/withdraw-requests",
+    route: withdrawRequestRoutes
+  },
+  {
     path: "/faq",
     route: faqRoutes
+  },
+  {
+    path: "/settings",
+    route: settingsRoutes
   },
   {
     path: "/privacyPolicy",

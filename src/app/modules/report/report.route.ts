@@ -17,5 +17,15 @@ reportRoutes.post("/create",
     reportsController.createReport
 );
 
+reportRoutes.post("/warn/:id",
+    auth(USER_ROLE.ADMIN),
+    reportsController.warnedUserByAdmin
+)
+
+reportRoutes.patch("/ban/:id",
+    auth(USER_ROLE.ADMIN),
+    reportsController.banUserByAdmin
+)
+
 // Route to get participants by event ID
 reportRoutes.get("/allReport", reportsController.getAllReports);

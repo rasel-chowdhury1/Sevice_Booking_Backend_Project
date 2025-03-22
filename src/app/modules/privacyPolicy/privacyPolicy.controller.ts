@@ -7,20 +7,12 @@ import { privacyPolicyService } from "./privacyPolicy.service";
 const getPrivacyPolicy = async (req: Request, res: Response) => {
     try {
         const policy = await privacyPolicyService.getPrivacyPolicy();
-        if (!policy) {
-            return sendResponse(res, {
-                statusCode: httpStatus.NOT_FOUND,
-                success: false,
-                message: "Privacy policy not found",
-                data: null,
-            });
-        }
 
         sendResponse(res, {
             statusCode: httpStatus.OK,
             success: true,
             message: "Privacy policy retrieved successfully",
-            data: policy,
+            data: policy || null,
         });
     } catch (error: any) {
         console.error("Error retrieving privacy policy:", error.message);

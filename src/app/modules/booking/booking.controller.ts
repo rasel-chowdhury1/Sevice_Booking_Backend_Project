@@ -65,13 +65,17 @@ const createBooking = catchAsync(async (req: Request, res: Response) => {
 
 
     // Create booking
-    const result = await bookingService.createPaymentByPaypalForBooking(req.body);
+    // const result = await bookingService.createPaymentByPaypalForBooking(req.body);
+
+    const result = await bookingService.confirmPaymentForBooking(req.body)
+
+    console.log({result})
 
     // Send success response
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'Successfully Paypal payment instant',
+      message: `Your payment was processed successfully.`,
       data: result,
     });
   } catch (error: any) {
@@ -85,25 +89,59 @@ const createBooking = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
-const confirmPaymentByPaypalForBooking = catchAsync( async (req: Request, res: Response) => {
-  console.log("=== payemtn query --->>> ", req.query);
+// const confirmPaymentByPaypalForBooking = catchAsync( async (req: Request, res: Response) => {
+//   console.log("=== payemtn query --->>> ", req.query);
   
-  const { paymentId, token, PayerID, user_id, guide_id,amount, booking_date, booking_time} = req.query;
+//   const { paymentId, token, PayerID, user_id, guide_id,amount, booking_date, booking_time} = req.query;
+
+//   const data = {
+//     paymentId,
+//     token,
+//     PayerID,
+//     user_id,
+//     guide_id,
+//     booking_date,
+//     booking_time,
+//     total_price: Number(amount) 
+//   }
+
+//   console.log({data})
+
+//   const paymentResult = await bookingService.confirmPaymentByPaypalForBooking(data);
+
+//   if(paymentResult){
+//     sendResponse(res, {
+//       statusCode: httpStatus.OK,
+//       success: true,
+//       message: "Payment confirmed, booking created successfully",
+//       data: paymentResult
+//     })
+//   }
+// })
+
+const confirmPaymentForBooking = catchAsync( async (req: Request, res: Response) => {
+  console.log("=== payemtn query --->>> ", req.query);
+  const {userId, } = req.user;
+  console.log("===>>> booking ",req.body)
+  const { paymentId, guide_id,amount, booking_date, booking_time, payment_method, booking_duration, duration_type} = req.body;
+
+ 
 
   const data = {
     paymentId,
-    token,
-    PayerID,
-    user_id,
+    user_id: userId,
     guide_id,
     booking_date,
     booking_time,
-    total_price: Number(amount) 
+    total_price: Number(amount),
+    booking_duration,
+    duration_type,
+    payment_method 
   }
 
   console.log({data})
 
-  const paymentResult = await bookingService.confirmPaymentByPaypalForBooking(data);
+  const paymentResult = await bookingService.confirmPaymentForBooking(data);
 
   if(paymentResult){
     sendResponse(res, {
@@ -156,6 +194,8 @@ const updatedBookingStatusByGuide = catchAsync(
         });
       }
 
+      
+
 
       // Prevent 'cancelEndRequest' status for the guide
       if (status === 'cancelEndRequest') {
@@ -183,13 +223,13 @@ const updatedBookingStatusByGuide = catchAsync(
         fullName,
         userId,
         bookingId,
-        status,
+        status
       );
 
       sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: 'Booking status updated successfully',
+        message: `Booking has been successfully updated to '${result.status}`,
         data: result,
       });
     } catch (error: any) {
@@ -221,6 +261,7 @@ const doneBookingBySeeker = catchAsync(
         message: 'Booking done successfully',
         data: result,
       });
+      
     } catch (error: any) {
       console.error('Error processing booking update:', error.message);
       sendResponse(res, {
@@ -341,5 +382,6 @@ export const bookingController = {
   getMyBookings,
   getBookingByUserId,
   getBookingByGuideId,
-  confirmPaymentByPaypalForBooking
+  confirmPaymentForBooking,
+  // confirmPaymentByPaypalForBooking
 };

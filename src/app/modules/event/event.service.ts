@@ -96,7 +96,7 @@ const getNearestEvents = async (userId: string, projects?: {}) => {
             coordinates: [longitude, latitude],
           },
           distanceField: 'distance',
-          maxDistance: 10000, // ✅ 10km max distance filter
+          maxDistance: 30000, // ✅ 30km max distance filter
           spherical: true,
         },
       },
@@ -120,6 +120,7 @@ const getNearestEvents = async (userId: string, projects?: {}) => {
           as: 'userParticipation',
         },
       },
+
       {
         $lookup: {
           from: 'calendars', // ✅ Check participation
@@ -139,6 +140,7 @@ const getNearestEvents = async (userId: string, projects?: {}) => {
           as: 'userCalendar',
         },
       },
+
       {
         $addFields: {
           isJoined: { $gt: [{ $size: '$userParticipation' }, 0] }, // ✅ True if user has joined
@@ -146,6 +148,7 @@ const getNearestEvents = async (userId: string, projects?: {}) => {
           type: 'event',
         },
       },
+
       {
         $match: {
           isDeleted: false, // ✅ Ignore deleted events
@@ -157,6 +160,7 @@ const getNearestEvents = async (userId: string, projects?: {}) => {
       {
         $sort: { distance: 1 }, // ✅ Sort by closest distance
       },
+
       {
         $project: projects || {
           title: 1,
@@ -178,6 +182,8 @@ const getNearestEvents = async (userId: string, projects?: {}) => {
         },
       },
     ]);
+
+    console.log({ events });
 
     return events;
   } catch (error) {
@@ -352,7 +358,10 @@ const getAllEvents = async (
   query: Record<string, unknown>,
 ): Promise<{ events: IEvent[]; meta: Record<string, number> }> => {
   try {
-    const modelQuery = Event.find({ isDeleted: false }); // Only fetch events where isDeleted is false
+    const modelQuery = Event.find({ isDeleted: false }).populate({
+      path: 'createdBy',
+      select: 'fullName email image', // Select specific fields from the User model
+    });; // Only fetch events where isDeleted is false
     // Use QueryBuilder for filtering, searching, sorting, pagination, and fields
     const queryBuilder = new QueryBuilder<IEvent>(modelQuery, query)
       .search(['title']) // Search within title and description
