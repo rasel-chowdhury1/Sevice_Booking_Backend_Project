@@ -5,6 +5,7 @@ import { User } from '../user/user.models';
 import SubscriptionPayment from './subscriptionPayment.model';
 import retrievePayment from '../../utils/paypal';
 import { createCheckoutSessionUsingPaypalForSubscription } from './subscriptionPayment.utils';
+import Payment from '../payment/payment.model';
 // import { createCheckoutSession, stripe } from './subscriptionPayment.utils';
 
 const findPaymentData = async (paymentDataBody: any) => {
@@ -120,6 +121,87 @@ const confirmPaymentByPaypal = async (data: any) => {
 // =======  pay pal implement for payment end ===== 
 
 
+// ======= confirm payment start =====
+const confirmPaymentSubcription = async(data: any) => {
+  console.log('==== confirm payment data ===>>>>>n ', data);
+  const { userId, subcriptionId, amount, duration, paymentIntentId, paymentMethod} = data;
+
+  if (!paymentIntentId ) {
+    // return res.status(400).json({ success: false, message: "Missing sessionId" });
+    throw new AppError(httpStatus.BAD_REQUEST, 'Missing paymentId ');
+  }
+
+  let paymentData;
+  try {
+
+    const paymentDataBody = {
+      guide_id: userId,
+      amount: Number(amount),
+      commission: Number(amount),
+      paymentStatus: "paid",
+      transactionId: paymentIntentId,
+      paymentMethod,
+      subscription: subcriptionId,
+      paymentType: "subscription"
+    };
+  
+    const isExistPaymentId = await Payment.findOne({
+      transactionId: paymentIntentId,
+    });
+  
+    if (isExistPaymentId) {
+      // return res.status(400).json({ success: false, message: "Payment Intent not found" });
+      throw new AppError(httpStatus.BAD_REQUEST, 'Payment id already use');
+    }
+  
+    console.log('==== payment data body ===>>>> ', paymentDataBody);
+
+    paymentData = new Payment(paymentDataBody);
+    await paymentData.save();
+
+    const today = new Date();
+
+    const expiryDate = new Date(today);
+    expiryDate.setDate(today.getDate() + Number(duration));
+
+    const updateUser = await User.findByIdAndUpdate(
+      userId,
+      { isSubcription: true, $inc: { points: 50 } },
+      { new: true },
+    );
+
+    if (!updateUser) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'User not exist');
+    }
+
+    const existingSubscription =
+      (await MySubscription.findOne({ user: userId })) ?? false;
+
+    if (existingSubscription) {
+      existingSubscription.subscription = subcriptionId;
+      existingSubscription.expiryDate = expiryDate;
+
+      await existingSubscription.save();
+    } else {
+      const newSubscription = new MySubscription({
+        user: userId,
+        subscription: subcriptionId,
+        expiryDate,
+      });
+
+      await newSubscription.save();
+    }
+  } catch (error: any) {
+    throw new AppError(httpStatus.NOT_ACCEPTABLE, error.message);
+  }
+
+  return paymentData;
+}
+
+// ======= confirm payment end =======
+
+
+
 
 
 // =======  stripe implement for payment start ===== 
@@ -221,6 +303,7 @@ export const SubcriptionPaymentService = {
   addPaymentData,
   createPaymentByPaypal,
   confirmPaymentByPaypal,
+  confirmPaymentSubcription
   
   //=== stripe start === 
   // createPayment,

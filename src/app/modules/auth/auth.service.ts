@@ -10,6 +10,7 @@ import { TUser } from '../user/user.interface';
 import { User } from '../user/user.models';
 import { OTPVerifyAndCreateUserProps } from '../user/user.service';
 import { TLogin } from './auth.interface';
+import { emitWarning } from 'process';
 
 const twilio = require('twilio');
 
@@ -66,6 +67,10 @@ const login = async (payload: TLogin) => {
     user,
     accessToken,
     refreshToken,
+    support: {
+      email: "support@gmail.com",
+      phone: "01855859847"
+    }
   };
 };
 
@@ -138,6 +143,7 @@ const forgotPasswordByNumber = async (phoneNumber: string) => {
     return { message: 'OTP sent successfully', otp };
     // res.status(200).json({ message: "OTP sent successfully", otp }); // For dev, include OTP (remove in prod)
   } catch (error: any) {
+    console.log(error)
     return { message: 'Failed to send OTP', error: error.message };
     // res.status(500).json({ message: "Failed to send OTP", error: error.message });
   }

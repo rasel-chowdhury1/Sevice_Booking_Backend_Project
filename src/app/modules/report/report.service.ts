@@ -1,5 +1,6 @@
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../error/AppError";
+import { createNotification } from "../notification/notification.utils";
 import { User } from "../user/user.models";
 import { IReport } from "./report.interface";
 import Report from "./report.model";
@@ -31,9 +32,68 @@ const createReport = async (payload: Partial<IReport>) => {
         throw new AppError(httpStatus.BAD_REQUEST, 'Report creation failed');
     }
 
+    // Now send a notification to the admin about the report
+    const admin = await User.findOne({ role: 'admin' });  // Assuming 'role' is used to identify admin users
+
+    if (admin) {
+        const adminNotificationData = {
+            user_id: userId,  // The user who made the report
+            recipient_id: admin._id,  // The admin user
+            type: "report",
+            title: `${user.fullName} reported ${reportUser.fullName}`,
+            message: `${user.fullName} has reported ${reportUser.fullName}. Please review the report.`
+        };
+
+        await createNotification(adminNotificationData);
+    }
+
     return result;
 };
 
+const warnUserByAdmin = async (id: string, payload: {userId:string, recipient_id: string, comment: string}) => {
+
+    await Report.findByIdAndUpdate(id,{isWarned: true}, {new: true});
+    const notificationData = {
+            user_id: payload.userId,
+            recipient_id: payload.recipient_id,
+            type: "warning",
+            title: "Account Warning: Policy Violation",
+            message: `You Have been warned by the admin for ${payload.comment}`,
+
+          };
+    await createNotification(notificationData);
+}
+
+const banUserByAdmin = async (id:string, payload: { userId: string; reportId: string; comment: string }) => {
+    try {
+      await Report.findByIdAndUpdate(id,{isBlocked: true}, {new: true});
+      // Ban the user
+
+    
+      const bannedUser = await User.findByIdAndUpdate(payload.reportId, { isBlocked: true }, { new: true });
+  
+      if (!bannedUser) {
+        throw new AppError(httpStatus.NOT_FOUND, "User not found");
+      }
+  
+      // Send notification
+      const notificationData = {
+        user_id: payload.userId, // The admin banning the user
+        recipient_id: payload.reportId, // The user getting banned
+        type: "warning",
+        title: "Account Warning: Policy Violation",
+        message: `You have been banned by the admin for: ${payload.comment}.`,
+      };
+  
+      await createNotification(notificationData);
+  
+      return bannedUser; // Return the updated user info
+    } catch (error) {
+      console.error("Error banning user:", error);
+      throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to ban user");
+    }
+  };
+  
 
 const getAllReports = async (query: Record<string, unknown>) => {
   try {
@@ -51,8 +111,8 @@ const getAllReports = async (query: Record<string, unknown>) => {
 
       // Apply population separately (since QueryBuilder does not handle population)
       queryBuilder.modelQuery = queryBuilder.modelQuery.populate([
-          { path: 'userId', select: 'fullName role' },
-          { path: 'reportId', select: 'fullName role' }
+          { path: 'userId', select: 'fullName role email' },
+          { path: 'reportId', select: 'fullName role email' }
       ]);
 
       // Execute the query to fetch filtered reports
@@ -107,7 +167,9 @@ const getAllReports = async (query: Record<string, unknown>) => {
 
 export const reportsService = {
     createReport,
-    getAllReports
+    getAllReports,
+    warnUserByAdmin,
+    banUserByAdmin
 }
 
 

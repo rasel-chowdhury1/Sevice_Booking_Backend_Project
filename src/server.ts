@@ -5,6 +5,7 @@ import app from './app';
 import config from './app/config';
 import initializeSocketIO from './socketio';
 import createDefaultAdmin from './app/DB/createDefaultAdmin';
+import cronJob from './app/utils/cronJob';
 
 let server: Server;
 export const io = initializeSocketIO(createServer(app));
@@ -15,6 +16,9 @@ async function main() {
     const result = await mongoose.connect(config.database_url as string);
 
     createDefaultAdmin();
+  
+    // Initialize cron job (ensure it runs immediately)
+    cronJob(); // Cron job will be scheduled and run here.
 
     // Start Express server
     // server = app.listen(Number(config.port), config.ip as string, () => {

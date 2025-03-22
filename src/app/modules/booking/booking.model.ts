@@ -31,10 +31,26 @@ const bookingSchema: Schema = new Schema<IBooking>({
         type: Number, 
         required: true 
     },
+    seekerPaymentId:{
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Payment', 
+        required: false
+    },
     commission: { 
         type: Number, 
         required: false,
         default: 0 
+    },
+
+    booking_duration: {
+        type: Number, 
+        required: true, // Store duration in hours or days
+    },
+    
+    duration_type: { 
+        type: String, 
+        required: true, 
+        enum: ['hours', 'days'] // Specify whether it's in hours or days
     },
 });
 

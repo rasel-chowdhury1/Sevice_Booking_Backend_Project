@@ -17,6 +17,12 @@ router.get(
   SubcriptionPaymentController.confirmPaymentByPaypal
 );
 
+router.post(
+  '/confirm-payment',
+  auth(USER_ROLE.GUIDE),
+  SubcriptionPaymentController.confirmPaymentSubcription
+)
+
 // == stripe implement for payment route --- start
 
 // router.post(

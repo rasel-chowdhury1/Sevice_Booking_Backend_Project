@@ -17,8 +17,17 @@ const reportSchema: Schema = new Schema<IReport>(
         required: true,
         minlength: 5,
         maxlength: 500,
-    }
     },
+    isWarned: {
+        type: Boolean,
+        default: false
+    },
+    isBlocked: {
+        type: Boolean,
+        default: false
+    }
+
+},
     {
         timestamps: true, // Automatically adds createdAt and updatedAt fields
     }

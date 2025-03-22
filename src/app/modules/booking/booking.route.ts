@@ -15,9 +15,11 @@ bookingRoutes.post(
   bookingController.createBooking,
 );
 
-bookingRoutes.get(
+bookingRoutes.post(
   '/confirm-payment', 
-  bookingController.confirmPaymentByPaypalForBooking
+  auth(USER_ROLE.SEEKER),
+  bookingController.confirmPaymentForBooking
+  // bookingController.confirmPaymentByPaypalForBooking
 );
 
 // Update booking data route start

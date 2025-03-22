@@ -40,7 +40,7 @@ const auth = (...userRoles: string[]) => {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized');
     }
 
-    // console.log({ decodeData });
+    console.log({ decodeData });
     req.user = decodeData;
     next();
   });

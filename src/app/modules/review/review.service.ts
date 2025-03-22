@@ -9,7 +9,7 @@ const createReview = async (reviewData: Partial<IReview>): Promise<IReview> => {
   console.log('========== review Data ======= ', reviewData);
 
   // Check if review_id exists in User model
-  const userExists = await User.findOne({ _id: reviewData.review_id });
+  const userExists = await User.findById(reviewData.review_id);
   if (!userExists) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
@@ -20,6 +20,16 @@ const createReview = async (reviewData: Partial<IReview>): Promise<IReview> => {
   // Create and save the review
   const review = new Review(reviewData);
   const savedReview = await review.save();
+
+  // Recalculate the average rating
+  const reviews = await Review.find({ review_id: reviewData.review_id });
+  const totalReviews = reviews.length;
+  const averageRating =
+    reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews;
+
+  // Update the User model with the new rating and review count
+  await User.findByIdAndUpdate(reviewData.review_id, {
+    rating: parseFloat(averageRating.toFixed(1))});
 
 
   const notificationData = {

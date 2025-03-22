@@ -13,5 +13,8 @@ export interface IBooking extends Document {
     booking_time: string; // Format: "HH:mm"
     status?: TBookingStatus;
     total_price: number;
+    seekerPaymentId: ObjectId;
     commission?: number;
+    booking_duration?: number;
+    duration_type: 'hours'| 'days';
 }
