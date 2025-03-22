@@ -18,6 +18,8 @@ const twilio = require('twilio');
 const accountSid = config.twilio_account_sid;
 const authToken = config.twilio_auth_token;
 const twilioPhone = config.twilio_phone_number;
+const supportEmail = config.support_email;
+const supportPhone = config.support_phone;
 // Create a Twilio client
 const client = twilio(accountSid, authToken);
 // Login
@@ -68,8 +70,8 @@ const login = async (payload: TLogin) => {
     accessToken,
     refreshToken,
     support: {
-      email: "support@gmail.com",
-      phone: "01855859847"
+      email: supportPhone,
+      phone: supportPhone
     }
   };
 };
