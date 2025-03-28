@@ -210,8 +210,9 @@ const getEventById = catchAsync(async (req: Request, res: Response) => {
 
 const deleteEvent = catchAsync(async (req: Request, res: Response) => {
   const {eventId} = req.params;
+  const {userId} = req.user;
 
-  await eventService.deleteEvent(eventId);
+  await eventService.deleteEvent(userId, eventId);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

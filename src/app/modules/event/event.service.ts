@@ -482,12 +482,19 @@ const getEventById = async (eventId: string): Promise<IEvent> => {
   }
 };
 
-const deleteEvent = async (eventId: string): Promise<void> => {
+const deleteEvent = async (user_id: string, eventId: string): Promise<void> => {
   try {
     const event = await Event.findById(eventId);
 
+    
+
     if (!event) {
       throw new AppError(httpStatus.NOT_FOUND, 'Event not found.');
+    }
+
+     // Ensure that only the creator of the event can delete it
+     if (event.createdBy.toString() !== user_id) {
+      throw new AppError(httpStatus.FORBIDDEN, 'You are not authorized to delete this event.');
     }
 
     // Mark the event as deleted
