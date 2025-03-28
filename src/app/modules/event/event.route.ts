@@ -61,6 +61,13 @@ eventRoutes.get(
   eventController.getNearestEvents,
 );
 
+// Get features events
+eventRoutes.get(
+  '/features',
+  auth(USER_ROLE.SEEKER, USER_ROLE.GUIDE, USER_ROLE.ADMIN),
+  eventController.getFeatureEventsForUser,
+);
+
 // Get upcoming events
 eventRoutes.get(
   '/upcoming',

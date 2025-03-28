@@ -298,7 +298,7 @@ const getUserWallet = async (id: string) => {
 };
 
 // ============= get Nearest guides functionlity start ================
-const getNearestGuides = async (userId: string, projects?: {}) => {
+const getNearestGuides = async (userId: string, currentLocation?: { latitude?: number, longitude?: number }, projects?: {}) => {
   try {
     // 1️⃣ Check if the seeker exists
     const seeker = await User.findById(userId);
@@ -307,25 +307,23 @@ const getNearestGuides = async (userId: string, projects?: {}) => {
       throw new AppError(httpStatus.NOT_FOUND, 'Seeker not found');
     }
 
-    // 2️⃣ Extract location & interests
-    const { location, interests } = seeker;
+    // 2️⃣ Check if latitude and longitude are provided in `currentLocation` or `req.query`
+    let { latitude, longitude } = currentLocation || {};
 
-    if (
-      !location ||
-      !location.coordinates ||
-      location.coordinates.length !== 2
-    ) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        'Seeker location is missing or invalid',
-      );
+    // If latitude and longitude are not provided, use seeker's location
+    if (!latitude || !longitude) {
+      if (!seeker.location || !seeker.location.coordinates || seeker.location.coordinates.length !== 2) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          'Seeker location is missing or invalid',
+        );
+      }
+      [longitude, latitude] = seeker.location.coordinates;
     }
-
-    const [longitude, latitude] = location.coordinates;
 
     // ✅ Safe handling of `interests` to prevent `undefined` error
     const seekerInterestsArray =
-      Array.isArray(interests) && interests.length > 0 ? interests : [];
+      Array.isArray(seeker.interests) && seeker.interests.length > 0 ? seeker.interests : [];
 
     console.log('==== Seeker Location & Interests ===', {
       longitude,
@@ -338,9 +336,8 @@ const getNearestGuides = async (userId: string, projects?: {}) => {
       user_id: userId,
       status: { $nin: ['done', 'cancelled'] }, // Exclude 'done' & 'cancelled' bookings
     }).distinct('guide_id'); // Get unique guide IDs
-    
 
-    console.log({activeBookings})
+    console.log({ activeBookings });
 
     // 3️⃣ Query nearest guides
     const guides = await User.aggregate([
@@ -350,31 +347,30 @@ const getNearestGuides = async (userId: string, projects?: {}) => {
             type: 'Point',
             coordinates: [longitude, latitude],
           },
-          // key: "location",
           distanceField: 'distance',
-          maxDistance: 5000, // ✅ 5km max distance filter
           spherical: true,
+          maxDistance: 5000, // 5km max distance filter (this is correct)
         },
       },
       {
         $match: {
-          role: 'guide', // ✅ Only guides
+          role: 'guide', // Only guides
           isActive: true,
           isDeleted: false,
           isBlocked: false,
           adminVerified: true,
-          _id: { $nin: activeBookings },
+          _id: { $nin: activeBookings }, // Exclude guides already booked by the seeker
           ...(seekerInterestsArray.length > 0 && {
             interests: { $in: seekerInterestsArray },
-          }), // ✅ Filter by shared interests
+          }), // Filter by shared interests
         },
       },
       {
-        $sort: { rating: -1 }, // ✅ Sort by highest rating
+        $sort: { rating: -1 }, // Sort by highest rating
       },
       {
         $addFields: {
-          type: 'user', // ✅ Add `type: user` to each document
+          type: 'user', // Add `type: user` to each document
         },
       },
       {
@@ -388,7 +384,7 @@ const getNearestGuides = async (userId: string, projects?: {}) => {
           about: 1,
           rating: 1,
           interests: 1,
-          distance: 1, // ✅ Return distance in meters
+          distance: 1, // Return distance in meters
           photos: 1,
           adminVerified: 1,
           myFee: 1,
@@ -396,18 +392,22 @@ const getNearestGuides = async (userId: string, projects?: {}) => {
       },
     ]);
 
+    console.log("guides ->>> ", guides)
     return guides;
   } catch (error) {
     console.error('Error fetching nearest guides:', error);
 
-    // ✅ Ensure error is properly typed before accessing `message`
+    // Ensure error is properly typed before accessing `message`
     const errorMessage =
       error instanceof Error ? error.message : 'An unknown error occurred';
 
     throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, errorMessage);
   }
 };
+
 // ============= get Nearest guides functionlity end ================
+
+
 
 // ============= get Nearest Seeker functionlity start ================
 const getNearestSeekers = async (userId: string, projects?: {}) => {
@@ -632,7 +632,7 @@ const getAllUserQuery = async (query: Record<string, unknown>) => {
   const meta = await userQuery.countTotal();
   // const result = await User.find({ isSubcription:false} );
 
-  // console.log(result,"-----------<>")
+  console.log(result,"-----------<>")
   return { meta, result };
 };
 

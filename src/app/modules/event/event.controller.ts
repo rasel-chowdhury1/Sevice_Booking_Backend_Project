@@ -96,6 +96,19 @@ const getUpcomingEventsForUser = catchAsync(async (req: Request, res: Response) 
     });
   });
 
+const getFeatureEventsForUser = catchAsync(async (req: Request, res: Response) => {
+
+  const { userId } = req.user;
+
+  const result = await eventService.getFeatureEventsForUser(userId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `Events fetched successfully`,
+    data: result,
+  });
+});
+
 const getMyCreatedEvents = catchAsync(async (req: Request, res: Response) => {
 
     const { userId } = req.user;
@@ -215,6 +228,7 @@ export const eventController = {
   createEvent,
   getNearestEvents,
   getUpcomingEventsForUser,
+  getFeatureEventsForUser,
   getMyCreatedEvents,
   updateEvent,
   getAllEvents,

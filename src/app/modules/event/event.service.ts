@@ -58,6 +58,8 @@ const createEvent = async (eventData: Partial<IEvent>) => {
 
 // ============= get Nearest events ================
 const getNearestEvents = async (userId: string, projects?: {}) => {
+
+  console.log("nearest event of user id ---->>> ", userId)
   try {
     // 1️⃣ Fetch user details
     const user = await User.findById(userId);
@@ -151,6 +153,7 @@ const getNearestEvents = async (userId: string, projects?: {}) => {
 
       {
         $match: {
+          createdBy: { $ne: user._id },
           isDeleted: false, // ✅ Ignore deleted events
           status: 'active', // ✅ Only active events
           date: { $gte: new Date() }, // ✅ Only future events
@@ -256,6 +259,79 @@ const getUpcomingEventsForUser = async (userId: string) => {
   }
 };
 // ============== get upcomming events  end ==============
+
+
+// ============== get features events  start ==============
+const getFeatureEventsForUser = async (userId: string) => {
+  try {
+    // Aggregation pipeline to join Events with Users and Participants
+    const events = await Event.aggregate([
+      {
+        $match: {
+          createdBy: { $ne: userId }, // Only events not created by the given user
+          date: { $gte: new Date() }, // Event date is today or in the future
+          isDeleted: { $ne: true }, // Exclude deleted events
+          status: { $ne: 'cancelled' }, // Exclude cancelled events
+        },
+      },
+      {
+        $lookup: {
+          from: 'users', // Join with the User collection
+          localField: 'createdBy', // The field in Event model to match
+          foreignField: '_id', // The field in User model to match
+          as: 'creator', // The alias for the joined user data
+        },
+      },
+      {
+        $unwind: '$creator', // Unwind the creator array to access user data directly
+      },
+      {
+        $match: {
+          'creator.isSubcription': true, // Only include events where the creator has a subscription
+        },
+      },
+      {
+        $lookup: {
+          from: 'participants', // Join with the Participant collection
+          localField: '_id', // Match Event ID
+          foreignField: 'event_id', // Match the event_id in the Participant collection
+          as: 'participants', // Alias for the participants data
+        },
+      },
+      {
+        $match: {
+          'participants.user_id': { $ne: new mongoose.Types.ObjectId(userId) }, // Ensure the user is not a participant
+        },
+      },
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          descriptionImage: 1,
+          createdBy: 1,
+          date: 1,
+          time: 1,
+          address: 1,
+          location: 1,
+          maxParticipants: 1,
+          bannerImage: 1,
+          coHosts: 1,
+          status: 1,
+        },
+      },
+    ]);
+
+    return events;
+
+  } catch (error) {
+    console.error('Error fetching feature events for user:', error);
+    const errorMessage =
+      error instanceof Error ? error.message : 'An unknown error occurred';
+    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, errorMessage);
+  }
+};
+
+// ============== get features events  end ==============
 
 // ============== get created events start ==============
 const getMyCreatedEvents = async (userId: string) => {
@@ -430,6 +506,7 @@ export const eventService = {
   createEvent,
   getNearestEvents,
   getUpcomingEventsForUser,
+  getFeatureEventsForUser,
   getMyCreatedEvents,
   updateEvent,
   getAllEvents,
