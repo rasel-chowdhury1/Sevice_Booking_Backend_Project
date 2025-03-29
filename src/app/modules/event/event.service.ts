@@ -57,7 +57,7 @@ const createEvent = async (eventData: Partial<IEvent>) => {
 };
 
 // ============= get Nearest events ================
-const getNearestEvents = async (userId: string, projects?: {}) => {
+const getNearestEvents = async (userId: string, currentLocation?: { latitude?: number, longitude?: number }, projects?: {}) => {
 
   console.log("nearest event of user id ---->>> ", userId)
   try {
@@ -68,21 +68,45 @@ const getNearestEvents = async (userId: string, projects?: {}) => {
       throw new AppError(httpStatus.NOT_FOUND, 'User not found');
     }
 
-    // 2️⃣ Extract user location
-    const { location } = user;
+    // // 2️⃣ Extract user location
+    // const { location } = user;
 
-    if (
-      !location ||
-      !location.coordinates ||
-      location.coordinates.length !== 2
-    ) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        'User location is missing or invalid',
-      );
-    }
+    // if (
+    //   !location ||
+    //   !location.coordinates ||
+    //   location.coordinates.length !== 2
+    // ) {
+    //   throw new AppError(
+    //     httpStatus.BAD_REQUEST,
+    //     'User location is missing or invalid',
+    //   );
+    // }
 
-    const [longitude, latitude] = location.coordinates;
+    // const [longitude, latitude] = location.coordinates;
+
+        // 2️⃣ Decide final coordinates based on currentLocation or user location
+        let latitude: number | undefined;
+        let longitude: number | undefined;
+    
+        if (currentLocation?.latitude && currentLocation?.longitude) {
+          latitude = currentLocation.latitude;
+          longitude = currentLocation.longitude;
+          console.log('Using currentLocation from request');
+        } else if (
+          user.location &&
+          user.location.coordinates &&
+          user.location.coordinates.length === 2
+        ) {
+          [longitude, latitude] = user.location.coordinates;
+          console.log('Using location from user profile');
+        } else {
+          throw new AppError(
+            httpStatus.BAD_REQUEST,
+            'User location is missing or invalid',
+          );
+        }
+
+    
 
     console.log('==== User Location ===', { longitude, latitude });
 
