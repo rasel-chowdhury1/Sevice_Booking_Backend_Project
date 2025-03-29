@@ -73,8 +73,23 @@ const createEvent = catchAsync(async (req: Request, res: Response) => {
 const getNearestEvents = catchAsync(async (req: Request, res: Response) => {
 
     const { userId } = req.user;
+
+    console.log("req.query ===>>>> ", req.query)
+    // Destructure lat and long from query parameters
+    const { lat, long } = req.query;
   
-    const result = await eventService.getNearestEvents(userId);
+    // Prepare data with latitude and longitude
+    const data: { latitude?: number, longitude?: number } = {};
+  
+    // If lat and long are provided, convert them to numbers and assign to data
+    if (lat && long) {
+      data.latitude = parseFloat(lat as string);
+      data.longitude = parseFloat(long as string);
+    }
+  
+    console.log(" data ===>>> ", data)
+  
+    const result = await eventService.getNearestEvents(userId, data);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
