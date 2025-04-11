@@ -78,12 +78,14 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
     }
   }
 
-  const result = await userService.updateUser(req?.user?.userId, req.body);
+  console.log('====== req body data ======', req.body);
+
+  // const result = await userService.updateUser(req?.user?.userId, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'profile updated successfully',
-    data: result,
+    data: "result",
   });
 });
 
