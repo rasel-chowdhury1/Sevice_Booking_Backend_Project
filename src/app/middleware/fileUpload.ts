@@ -129,7 +129,7 @@ const fileUpload = (uploadDirectory: string) => {
     },
   });
 
-  // console.log("==== upload === ", upload)
+  console.log("==== upload === ", upload)
 
   return upload;
 };

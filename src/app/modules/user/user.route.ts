@@ -25,6 +25,19 @@ userRoutes
     userController.userCreateVarification,
   )
 
+  .patch(
+    '/update-my-profile',
+    auth(USER_ROLE.SEEKER, USER_ROLE.ADMIN, USER_ROLE.GUIDE),
+
+    upload.fields([
+      { name: 'image', maxCount: 1 },
+      { name: 'document', maxCount: 1 },
+      { name: 'photos', maxCount: 10 },
+    ]),
+
+    parseData(),
+    userController.updateMyProfile,
+  )
   // check email is exist route
   .get('/email-exist', userController.isUserEmailExist)
 
@@ -131,19 +144,7 @@ userRoutes
   //   userController.updateMyProfile,
   // )
 
-  .patch(
-    '/update-my-profile',
-    auth(USER_ROLE.SEEKER, USER_ROLE.ADMIN, USER_ROLE.GUIDE),
 
-    upload.fields([
-      { name: 'image', maxCount: 1 },
-      { name: 'document', maxCount: 1 },
-      { name: 'photos', maxCount: 10 },
-    ]),
-
-    parseData(),
-    userController.updateMyProfile,
-  )
 
   .put('/block/:id', auth(USER_ROLE.ADMIN), userController.blockedUser)
 
