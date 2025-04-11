@@ -410,7 +410,7 @@ const getNearestGuides = async (userId: string, currentLocation?: { latitude?: n
 
 
 // ============= get Nearest Seeker functionlity start ================
-const getNearestSeekers = async (userId: string, projects?: {}) => {
+const getNearestSeekers = async (userId: string, currentLocation?: { latitude?: number, longitude?: number }, projects?: {}) => {
   try {
     // 1️⃣ Check if the seeker exists
     const plusone = await User.findById(userId);
@@ -422,18 +422,32 @@ const getNearestSeekers = async (userId: string, projects?: {}) => {
     // 2️⃣ Extract location & interests
     const { location, interests } = plusone;
 
-    if (
-      !location ||
-      !location.coordinates ||
-      location.coordinates.length !== 2
-    ) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        'Seeker location is missing or invalid',
-      );
-    }
+    // if (
+    //   !location ||
+    //   !location.coordinates ||
+    //   location.coordinates.length !== 2
+    // ) {
+    //   throw new AppError(
+    //     httpStatus.BAD_REQUEST,
+    //     'Seeker location is missing or invalid',
+    //   );
+    // }
 
-    const [longitude, latitude] = location.coordinates;
+    // const [longitude, latitude] = location.coordinates;
+
+    // 2️⃣ Check if latitude and longitude are provided in `currentLocation` or `req.query`
+    let { latitude, longitude } = currentLocation || {};
+
+    // If latitude and longitude are not provided, use seeker's location
+    if (!latitude || !longitude) {
+      if (!location || !location.coordinates || location.coordinates.length !== 2) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          'Seeker location is missing or invalid',
+        );
+      }
+      [longitude, latitude] = location.coordinates;
+    }
 
     // ✅ Safe handling of `interests` to prevent `undefined` error
     const seekerInterestsArray =

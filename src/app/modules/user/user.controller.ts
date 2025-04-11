@@ -188,8 +188,23 @@ const getNearestGuidesAndEvents = catchAsync(
     let users;
     let seekers = null;
     let events;
+
+    // Destructure lat and long from query parameters
+  const { lat, long } = req.query;
+
+  // Prepare data with latitude and longitude
+  const data: { latitude?: number, longitude?: number } = {};
+
+  // If lat and long are provided, convert them to numbers and assign to data
+  if (lat && long) {
+    data.latitude = parseFloat(lat as string);
+    data.longitude = parseFloat(long as string);
+  }
+
+  console.log(" data ===>>> ", data)
+
     if (role === 'seeker') {
-      users = await userService.getNearestGuides(userId,{}, {
+      users = await userService.getNearestGuides(userId,data, {
         image: 1,
         fullName: 1,
         address: 1,
@@ -197,7 +212,7 @@ const getNearestGuidesAndEvents = catchAsync(
         role: 1,
         type: 1,
       });
-      seekers = await userService.getNearestSeekers(userId, {
+      seekers = await userService.getNearestSeekers(userId,data, {
         image: 1,
         fullName: 1,
         address: 1,
@@ -205,7 +220,7 @@ const getNearestGuidesAndEvents = catchAsync(
         role: 1,
         type: 1,
       });
-      events = await eventService.getNearestEvents(userId, {
+      events = await eventService.getNearestEvents(userId,data, {
         title: 1,
         bannerImage: 1,
         address: 1,
@@ -213,7 +228,7 @@ const getNearestGuidesAndEvents = catchAsync(
         type: 1,
       });
     } else {
-      users = await userService.getNearestSeekers(userId, {
+      users = await userService.getNearestSeekers(userId, data, {
         image: 1,
         fullName: 1,
         address: 1,
@@ -221,7 +236,7 @@ const getNearestGuidesAndEvents = catchAsync(
         role: 1,
         type: 1,
       });
-      events = await eventService.getNearestEvents(userId, {
+      events = await eventService.getNearestEvents(userId, data, {
         title: 1,
         bannerImage: 1,
         address: 1,
