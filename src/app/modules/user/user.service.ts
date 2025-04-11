@@ -222,8 +222,6 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
     ...rest
   } = payload;
 
-
-  console.log("rest data --->>> ", rest);
   if(role === 'guide'){
 
   }
@@ -236,8 +234,11 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
       coordinates: [parseFloat(longitude), parseFloat(latitude)],
     };
   }
+  console.log("rest data --->>> ", rest);
   // Fetch the existing user to get current photos
   const existingUser = (await User.findById(id)) as TUser | null;
+
+  console.log("existingUser --->>> ", existingUser);
 
   if (!existingUser) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
@@ -257,6 +258,8 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
   } else {
     (rest as Partial<TUser>).photos = existingUser.photos;
   }
+
+  console.log("rest last -->> ", rest);
 
   // If there are new photos, merge them with the existing ones
   if (photos && Array.isArray(photos)) {
