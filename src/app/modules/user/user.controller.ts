@@ -49,8 +49,6 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
         req.files as { [fieldName: string]: Express.Multer.File[] },
       );
 
-      console.log('==== file paths =====', filePaths);
-
       // Set image (single file)
       if (filePaths.image && filePaths.image.length > 0) {
         req.body.image = filePaths.image[0]; // Assign first image
@@ -66,7 +64,6 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
         req.body.photos = filePaths.photos; // Assign full array of photos
       }
 
-      console.log('body data =>>> ', req.body);
     } catch (error: any) {
       console.error('Error processing files:', error.message);
       return sendResponse(res, {
