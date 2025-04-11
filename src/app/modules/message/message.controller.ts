@@ -144,6 +144,8 @@ const seenMessage = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+
 // Delete message
 const deleteMessages = catchAsync(async (req: Request, res: Response) => {
   const result = await messagesService.deleteMessages(req.params.id);
