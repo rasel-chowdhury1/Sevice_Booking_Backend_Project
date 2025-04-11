@@ -207,6 +207,7 @@ const otpVerifyAndCreateUser = async ({
 
 // ====================== update user without role, email,isActive,isDeleted, password,  start ==========================
 const updateUser = async (id: string, payload: Partial<TUser>) => {
+  console.log("payload update user --->>> ", payload)
   const {
     role,
     email,
@@ -248,7 +249,6 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
     delPhotos = JSON.parse(deletePhotos);
   }
 
-  console.log('===== update user ==== ', delPhotos);
   // Handle deleting photos
   if (deletePhotos && Array.isArray(delPhotos)) {
     (rest as Partial<TUser>).photos = existingUser.photos?.filter(
@@ -274,6 +274,8 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
 
 
   const user = await User.findByIdAndUpdate(id, rest, { new: true });
+
+
 
   if (!user) {
     throw new AppError(httpStatus.BAD_REQUEST, 'User updating failed');
