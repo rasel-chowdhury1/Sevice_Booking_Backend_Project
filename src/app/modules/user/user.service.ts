@@ -221,6 +221,8 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
     ...rest
   } = payload;
 
+
+  console.log("rest data --->>> ", rest);
   if(role === 'guide'){
 
   }
