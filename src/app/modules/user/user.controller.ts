@@ -35,6 +35,58 @@ const createUserAdmin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
+  console.log('====== req files data ======', req.files);
+  console.log('====== req body data ======', req.body);
+
+  // Check if there are uploaded files
+  if (req.files) {
+    try {
+      // Use storeFiles to process all uploaded files
+      const filePaths = storeFiles(
+        'profile',
+        req.files as { [fieldName: string]: Express.Multer.File[] },
+      );
+
+      console.log('==== file paths =====', filePaths);
+
+      // Set image (single file)
+      if (filePaths.image && filePaths.image.length > 0) {
+        req.body.image = filePaths.image[0]; // Assign first image
+      }
+
+      // Set photos (multiple files)
+      if (filePaths.document && filePaths.document.length > 0) {
+        req.body.document = filePaths.document[0]; // Assign full array of photos
+      }
+
+      // Set photos (multiple files)
+      if (filePaths.photos && filePaths.photos.length > 0) {
+        req.body.photos = filePaths.photos; // Assign full array of photos
+      }
+
+      console.log('body data =>>> ', req.body);
+    } catch (error: any) {
+      console.error('Error processing files:', error.message);
+      return sendResponse(res, {
+        statusCode: httpStatus.BAD_REQUEST,
+        success: false,
+        message: 'Failed to process uploaded files',
+        data: null,
+      });
+    }
+  }
+
+  const result = await userService.updateUser(req?.user?.userId, req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'profile updated successfully',
+    data: result,
+  });
+});
+
 const isUserEmailExist = catchAsync(async (req, res) => {
   // const as = await User.findById('674db0fb690c8d666f6c3a1c');
   console.log(req);
@@ -449,56 +501,6 @@ const getMyProfile = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
-  console.log('====== req files data ======', req.files);
-  console.log('====== req body data ======', req.body);
-
-  // Check if there are uploaded files
-  if (req.files) {
-    try {
-      // Use storeFiles to process all uploaded files
-      const filePaths = storeFiles(
-        'profile',
-        req.files as { [fieldName: string]: Express.Multer.File[] },
-      );
-
-      console.log('==== file paths =====', filePaths);
-
-      // Set image (single file)
-      if (filePaths.image && filePaths.image.length > 0) {
-        req.body.image = filePaths.image[0]; // Assign first image
-      }
-
-      // Set photos (multiple files)
-      if (filePaths.document && filePaths.document.length > 0) {
-        req.body.document = filePaths.document[0]; // Assign full array of photos
-      }
-
-      // Set photos (multiple files)
-      if (filePaths.photos && filePaths.photos.length > 0) {
-        req.body.photos = filePaths.photos; // Assign full array of photos
-      }
-
-      console.log('body data =>>> ', req.body);
-    } catch (error: any) {
-      console.error('Error processing files:', error.message);
-      return sendResponse(res, {
-        statusCode: httpStatus.BAD_REQUEST,
-        success: false,
-        message: 'Failed to process uploaded files',
-        data: null,
-      });
-    }
-  }
-
-  const result = await userService.updateUser(req?.user?.userId, req.body);
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'profile updated successfully',
-    data: result,
-  });
-});
 
 const blockedUser = catchAsync(async (req: Request, res: Response) => {
   const result = await userService.blockedUser(req.params.id);
