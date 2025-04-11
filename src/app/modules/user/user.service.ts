@@ -226,7 +226,7 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
   }
 
   let delPhotos = deletePhotos;
-  console.log('===== update user ==== ', delPhotos);
+  
   if (longitude !== undefined && latitude !== undefined) {
     rest.location = {
       type: 'Point',
@@ -270,9 +270,6 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
     rest.interests = JSON.parse(rest.interests);
   }
 
-  console.log('update user data ===== ', payload);
-
-  console.log('rest data ===> ', rest);
 
   const user = await User.findByIdAndUpdate(id, rest, { new: true });
 
