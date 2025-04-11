@@ -275,9 +275,10 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
 
   const user = await User.findByIdAndUpdate(id, rest, { new: true });
 
-
+console.log("user 0-->> ", user);
 
   if (!user) {
+    console.log("throw error from this --->>> ", user)
     throw new AppError(httpStatus.BAD_REQUEST, 'User updating failed');
   }
 
