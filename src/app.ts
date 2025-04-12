@@ -20,9 +20,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: true,
-    // origin: 'https://memorial-moments-website.vercel.app',
-    credentials: true,
+    // origin: true,
+    origin: '*',
+    // credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   }),
 );
