@@ -15,14 +15,26 @@ app.use(logHttpRequests);
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
+const allowedOrigins = [
+  'http://204.197.173.195:9000',    // your deployed frontend
+  'http://localhost:9000',          // local dev frontend
+  'http://192.168.0.101:3000',      // mobile browser in same WiFi
+  'https://yourfrontend.com',       // custom domain frontend
+  "*"
+];
 //parsers
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    // origin: true,
-    origin: '*',
-    // credentials: true,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   }),
 );
