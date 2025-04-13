@@ -10,31 +10,34 @@ import globalErrorHandler from './app/middleware/globalErrorhandler';
 import router from './app/routes';
 import notFound from './app/middleware/notfound';
 import { logHttpRequests } from './app/utils/logger';
+import { order } from 'paypal-rest-sdk';
 const app: Application = express();
 app.use(logHttpRequests);
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
 const allowedOrigins = [
-  'http://204.197.173.195:9000',    // your deployed frontend
-  'http://localhost:9000',          // local dev frontend
-  'http://192.168.0.101:3000',      // mobile browser in same WiFi
-  'https://yourfrontend.com',       // custom domain frontend
-  "*"
+  'http://localhost:9000', // Allow only this origin for credentials
+  'http://204.197.173.195:9000',
+  'http://204.197.173.195:4173'
+  // Add any other allowed origins here
 ];
 //parsers
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: (origin, callback) => {
+    origin: function (origin, callback) {
+
+      console.log("origin data ->>>> ", origin);
+      // Allow requests with no origin (e.g., mobile apps, curl requests)
       if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
+        return callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        return callback(new Error('Not allowed by CORS'));
       }
     },
-    credentials: true,
+    credentials: true, // Allow credentials
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   }),
 );
