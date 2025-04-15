@@ -78,6 +78,8 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
   console.log('====== req body data ======', req.body);
 
   const result = await userService.updateUser(req?.user?.userId, req.body);
+
+  console.log('====== update profile data result ======', result);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
