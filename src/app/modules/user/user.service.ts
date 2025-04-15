@@ -222,13 +222,11 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
     ...rest
   } = payload;
 
-  if(role === 'guide'){
-
-  }
 
   let delPhotos = deletePhotos;
   
   if (longitude !== undefined && latitude !== undefined) {
+    
     rest.location = {
       type: 'Point',
       coordinates: [parseFloat(longitude), parseFloat(latitude)],
@@ -238,7 +236,7 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
   // Fetch the existing user to get current photos
   const existingUser = (await User.findById(id)) as TUser | null;
 
-
+  console.log("existing User -->>> ", existingUser);
 
   if (!existingUser) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
@@ -273,6 +271,8 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
   if (typeof rest.interests === 'string') {
     rest.interests = JSON.parse(rest.interests);
   }
+
+  console.log("user rest data --->>>", rest);
 
 
   const user = await User.findByIdAndUpdate(id, rest, { new: true });
