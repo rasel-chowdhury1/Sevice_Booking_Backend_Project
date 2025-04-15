@@ -131,7 +131,6 @@ const otpVerifyAndCreateUser = async ({
     access_secret: config.jwt_access_secret as string,
   });
 
-  console.log({ decodeData });
 
   if (!decodeData) {
     throw new AppError(httpStatus.BAD_REQUEST, 'You are not authorised');
@@ -139,7 +138,6 @@ const otpVerifyAndCreateUser = async ({
 
   const { password, email, role } = decodeData;
 
-  console.log({ otp });
 
   const isOtpMatch = await otpServices.otpMatch(email, otp);
 
@@ -172,8 +170,6 @@ const otpVerifyAndCreateUser = async ({
     );
   }
 
-  console.log({ userData });
-  console.log('user service otp: -> ');
   const user = await User.create(userData);
 
   console.log('user service otp: -> ', user);
@@ -191,9 +187,6 @@ const otpVerifyAndCreateUser = async ({
     userId: user?._id?.toString() as string,
     role: user?.role,
   };
-
-  // console.log({ jwtPayload });
-  console.log('user user', user);
 
   const accessToken = createToken({
     payload: jwtPayload,
