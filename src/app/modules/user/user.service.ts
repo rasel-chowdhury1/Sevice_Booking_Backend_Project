@@ -228,11 +228,12 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
   let delPhotos = deletePhotos;
   
   if (longitude !== undefined && latitude !== undefined) {
-    
+    console.log("lang-lattitude ==>>> ", longitude,latitude)
     rest.location = {
       type: 'Point',
       coordinates: [parseFloat(longitude), parseFloat(latitude)],
     };
+    console.log("rest date 2 -->>>>>>>>> ", rest)
   }
   
   // Fetch the existing user to get current photos
