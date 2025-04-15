@@ -222,6 +222,8 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
     ...rest
   } = payload;
 
+  console.log("rest date -->>>>>>>>> ", rest)
+
 
   let delPhotos = deletePhotos;
   
