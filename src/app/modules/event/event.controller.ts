@@ -73,8 +73,6 @@ const createEvent = catchAsync(async (req: Request, res: Response) => {
 const getNearestEvents = catchAsync(async (req: Request, res: Response) => {
 
     const { userId } = req.user;
-
-    console.log("req.query ===>>>> ", req.query)
     // Destructure lat and long from query parameters
     const { lat, long } = req.query;
   
@@ -86,8 +84,6 @@ const getNearestEvents = catchAsync(async (req: Request, res: Response) => {
       data.latitude = parseFloat(lat as string);
       data.longitude = parseFloat(long as string);
     }
-  
-    console.log(" data ===>>> ", data)
   
     const result = await eventService.getNearestEvents(userId, data);
     sendResponse(res, {

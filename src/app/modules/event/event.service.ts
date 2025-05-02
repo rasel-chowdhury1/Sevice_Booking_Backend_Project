@@ -59,7 +59,6 @@ const createEvent = async (eventData: Partial<IEvent>) => {
 // ============= get Nearest events ================
 const getNearestEvents = async (userId: string, currentLocation?: { latitude?: number, longitude?: number }, projects?: {}) => {
 
-  console.log("nearest event of user id ---->>> ", userId)
   try {
     // 1️⃣ Fetch user details
     const user = await User.findById(userId);
@@ -107,8 +106,6 @@ const getNearestEvents = async (userId: string, currentLocation?: { latitude?: n
         }
 
     
-
-    console.log('==== User Location ===', { longitude, latitude });
 
     // ✅ Ensure `location` field has a `2dsphere` index
     await Event.collection.createIndex({ location: '2dsphere' });
@@ -210,7 +207,6 @@ const getNearestEvents = async (userId: string, currentLocation?: { latitude?: n
       },
     ]);
 
-    console.log({ events });
 
     return events;
   } catch (error) {

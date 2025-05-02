@@ -706,7 +706,6 @@ const getBookingById = async (bookingId: string) => {
 
 const getMyBookings = async (payload: {}, populate_Item: string) => {
   try {
-    console.log({ payload });
     const booking = await Booking.find(payload).populate(
       populate_Item,
       'fullName location image address photos interests rating myFee',

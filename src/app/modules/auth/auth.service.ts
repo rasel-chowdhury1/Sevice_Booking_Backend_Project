@@ -24,7 +24,6 @@ const supportPhone = config.support_phone;
 const client = twilio(accountSid, authToken);
 // Login
 const login = async (payload: TLogin) => {
-  console.log('payload', payload);
   const user = await User.isUserActive(payload?.email);
 
   if (!user) {
@@ -49,15 +48,12 @@ const login = async (payload: TLogin) => {
     role: user?.role,
   };
 
-  console.log({ jwtPayload });
 
   const accessToken = createToken({
     payload: jwtPayload,
     access_secret: config.jwt_access_secret as string,
     expity_time: config.jwt_access_expires_in as string,
   });
-
-  console.log({ accessToken });
 
   const refreshToken = createToken({
     payload: jwtPayload,

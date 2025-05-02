@@ -18,6 +18,7 @@ const socketIO = (io: Server) => {
   io.use(socketAuthMiddleware);
 
   io.on('connection', (socket: AuthenticatedSocket) => {
+    console.log('connected', socket?.id);
     const user = socket.decodedToken
 
     // Ensure user and user.userId exist before modifying activeUsers

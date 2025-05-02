@@ -51,6 +51,8 @@ const initializeSocketIO = (server: HttpServer) => {
 
       const user: any = (socket as any)?.decodedToken;
 
+      console.log("user -->>> ", user)
+
       //==================== check user is not exist  =======================
       if (!user) {
         // io.emit('io-error', {success:false, message:'invalid Token'});
@@ -205,7 +207,7 @@ const initializeSocketIO = (server: HttpServer) => {
 
       // ================== send message functionlity start optimize way === working check done in this function ========================
       socket.on('send-message', async (payload, callback) => {
-        console.log('====== send new message payload data >>>>>>>>>', payload);
+        // console.log('====== send new message payload data >>>>>>>>>', payload);
         const session = await mongoose.startSession();
         let transactionCommitted = false; // Track transaction status
         session.startTransaction();
@@ -260,7 +262,7 @@ const initializeSocketIO = (server: HttpServer) => {
 
           // =========== Process Image Uploads functionlity end ===========
 
-          console.log('==== send message data ===== ', payload);
+          // console.log('==== send message data ===== ', payload);
 
           // ✅ Step 3: Create Message
           const result = await Message.create([payload], { session });
@@ -268,9 +270,10 @@ const initializeSocketIO = (server: HttpServer) => {
           if (!result || result.length === 0) {
             throw new Error('Message creation failed');
           }
-
+          // console.log("result message -->>> ", result)
           const message = result[0];
-
+          
+          // console.log("message --->> ", message)
           // ✅ Step 4: Commit Transaction
           await session.commitTransaction();
           transactionCommitted = true; // Mark as committed

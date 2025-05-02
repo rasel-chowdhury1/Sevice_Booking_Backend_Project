@@ -325,11 +325,6 @@ const getNearestGuides = async (userId: string, currentLocation?: { latitude?: n
     const seekerInterestsArray =
       Array.isArray(seeker.interests) && seeker.interests.length > 0 ? seeker.interests : [];
 
-    console.log('==== Seeker Location & Interests ===', {
-      longitude,
-      latitude,
-      seekerInterestsArray,
-    });
 
     // 3️⃣ Find guides who have been booked by this seeker with status NOT 'done' or 'cancelled'
     const activeBookings = await Booking.find({
@@ -392,7 +387,6 @@ const getNearestGuides = async (userId: string, currentLocation?: { latitude?: n
       },
     ]);
 
-    console.log("guides ->>> ", guides)
     return guides;
   } catch (error) {
     console.error('Error fetching nearest guides:', error);
@@ -453,11 +447,6 @@ const getNearestSeekers = async (userId: string, currentLocation?: { latitude?: 
     const seekerInterestsArray =
       Array.isArray(interests) && interests.length > 0 ? interests : [];
 
-    console.log('==== Seeker Location & Interests ===', {
-      longitude,
-      latitude,
-      seekerInterestsArray,
-    });
 
     // 3️⃣ Query nearest guides
     const guides = await User.aggregate([
@@ -556,11 +545,6 @@ const getIslookingGuideOfSeekers = async (userId: string, projects?: {}) => {
     const seekerInterestsArray =
       Array.isArray(interests) && interests.length > 0 ? interests : [];
 
-    console.log('==== Seeker Location & Interests ===', {
-      longitude,
-      latitude,
-      seekerInterestsArray,
-    });
 
     // 3️⃣ Query nearest guides
     const guides = await User.aggregate([
@@ -629,7 +613,6 @@ const getIslookingGuideOfSeekers = async (userId: string, projects?: {}) => {
 // ============= get which seeker want is looking for guide  functionlity  end ================
 
 const getAllUserQuery = async (query: Record<string, unknown>) => {
-  console.log('========>>>>>::', typeof query.isSubcription);
   // Convert 'isSubcription' query parameter to a boolean
   if (query.isSubcription !== undefined) {
     query.isSubcription = query.isSubcription === 'true';

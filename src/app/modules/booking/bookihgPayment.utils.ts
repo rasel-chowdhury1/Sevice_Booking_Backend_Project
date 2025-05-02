@@ -10,7 +10,6 @@ export const createCheckoutSessionUsingPaypalForBooking = async (
   payload: any,
 ) => {
 
-  console.log("payload ->> ", payload)
   try {
     const {
       user_id,

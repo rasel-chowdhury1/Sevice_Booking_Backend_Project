@@ -206,7 +206,6 @@ const unBlockUserByAdmin = catchAsync(async (req: Request, res: Response) => {
 const getNearestGuides = catchAsync(async (req: Request, res: Response) => {
   const { userId } = req.user;
   
-  console.log("req.query ===>>>> ", req.query)
   // Destructure lat and long from query parameters
   const { lat, long } = req.query;
 
@@ -219,7 +218,6 @@ const getNearestGuides = catchAsync(async (req: Request, res: Response) => {
     data.longitude = parseFloat(long as string);
   }
 
-  console.log(" data ===>>> ", data)
 
   // Call the service to get nearest guides
   const result = await userService.getNearestGuides(userId, data);
@@ -254,7 +252,6 @@ const getNearestGuidesAndEvents = catchAsync(
     data.longitude = parseFloat(long as string);
   }
 
-  console.log(" data ===>>> ", data)
 
     if (role === 'seeker') {
       users = await userService.getNearestGuides(userId,data, {

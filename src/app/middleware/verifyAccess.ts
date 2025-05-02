@@ -8,7 +8,6 @@ const verifyAccess = (...userRoles: string[]) => {
         // console.log("====== req body data ====== ", req)
         // console.log("======= headers data ===== ",req.headers)
         const decodeData = req?.user;
-        console.log({decodeData})
 
         const userId = decodeData?.userId;
 
