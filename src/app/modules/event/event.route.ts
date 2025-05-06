@@ -6,7 +6,7 @@ import validateRequest from '../../middleware/validateRequest';
 import { USER_ROLE } from '../user/user.constants';
 import { eventController } from './event.controller';
 import { eventValidation } from './event.validation';
-const eventUpload = fileUpload('./public/uploads/event');
+const eventUpload = fileUpload('./public/uploads/events');
 
 export const eventRoutes = Router();
 

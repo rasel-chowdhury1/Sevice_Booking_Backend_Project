@@ -12,7 +12,7 @@ const socketAuthMiddleware = (socket: AuthenticatedSocket, next: (err?: Error) =
   console.log("token---execute>>>> ", );
   // Retrieve token from different possible locations
   const token =
-    socket.handshake.headers.token ;
+    socket.handshake.headers.token as any;
 
     console.log("token---execute>>>> ", socket.handshake.headers);
 

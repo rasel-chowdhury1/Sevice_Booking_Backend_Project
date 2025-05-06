@@ -26,6 +26,7 @@ const client = twilio(accountSid, authToken);
 const login = async (payload: TLogin) => {
   const user = await User.isUserActive(payload?.email);
 
+  console.log("user -->>> ")
   if (!user) {
     throw new AppError(httpStatus.BAD_REQUEST, 'User not found');
   }

@@ -19,7 +19,8 @@ app.use(express.urlencoded({ extended: true }));
 const allowedOrigins = [
   'http://localhost:9000', // Allow only this origin for credentials
   'http://204.197.173.195:9000',
-  'http://204.197.173.195:4173'
+  'http://204.197.173.195:4173',
+  'https://gydes.netlify.app'
   // Add any other allowed origins here
 ];
 //parsers
