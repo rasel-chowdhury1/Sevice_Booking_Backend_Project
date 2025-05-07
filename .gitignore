@@ -28,7 +28,7 @@ build/
 out/
 
 # Ignore environment-specific files
-.env
+# .env
 .env.local
 .env.*.local
 
@@ -65,4 +65,4 @@ venv/
 env/
 .vercel
 .vercel
-public/
+# public/
