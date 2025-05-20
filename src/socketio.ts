@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // socketIO.js
+import { Server as SocketIOServer, Socket } from "socket.io";
 import { Server as HttpServer } from 'http';
 import httpStatus from 'http-status';
 import mongoose from 'mongoose';
@@ -23,8 +24,10 @@ import { promisify } from 'util';
 const writeFileAsync = promisify(fs.writeFile);
 const imagesDir = path.join(__dirname, 'uploads'); // Local storage for images
 
+let io: SocketIOServer;
+
 const initializeSocketIO = (server: HttpServer) => {
-  const io = new Server(server, {
+   io = new Server(server, {
     cors: {
       origin: '*',
     },
@@ -531,77 +534,24 @@ const initializeSocketIO = (server: HttpServer) => {
 
 export default initializeSocketIO;
 
-// ================== send message functionlity start ========================
-// socket.on('send-message', async (payload, callback) => {
 
-//   payload.sender = user?._id;
 
-//   //  Check if a chat already exists between the sender and receiver then chat value set existing chatid
-//   const alreadyExists = await Chat.findOne({
-//     // MongoDB `$all` operator ensures both users exist in the `participants` array
-//     // irrespective of order (e.g., [A, B] or [B, A] will both match)
-//     participants: { $all: [payload.sender, payload.receiver] },
-//   }).populate(['participants']);
+export const verifiedUserNotify = async ({
+  userId
+}: {
+  userId: string;
+}): Promise<void> => {
 
-//   if (!alreadyExists) {
-//     const chatList = await Chat.create({
-//       participants: [payload.sender, payload.receiver],
-//     });
+  console.log(`userVeriflied::${userId}`)
+  if (!io) {
+    throw new Error("Socket.IO is not initialized");
+  }
 
-//     payload.chat = chatList?._id;
-//   } else {
-//     payload.chat = alreadyExists?._id;
-//   }
+io.emit(`userVeriflied::${userId}`, {
+      statusCode: 200,
+      success: true,
+      message: "admin verified your account"
+    });
 
-//   const result = await Message.create(payload);
-
-//   if (!result) {
-//     callbackFn(callback, {
-//       statusCode: httpStatus.BAD_REQUEST,
-//       success: false,
-//       message: 'Message sent failed',
-//     });
-//   }
-
-//   const senderMessage = 'new-message::' + result.chat.toString();
-
-//   io.emit(senderMessage, result);
-
-//   // //----------------------ChatList------------------------//
-//   const ChatListSender = await chatService.getMyChatList(
-//     result?.sender.toString(),
-//   );
-//   const senderChat = 'chat-list::' + result.sender.toString();
-//   io.emit(senderChat, ChatListSender);
-
-//   const ChatListReceiver = await chatService.getMyChatList(
-//     result?.receiver.toString(),
-//   );
-
-//   const receiverChat = 'chat-list::' + result.receiver.toString();
-
-//   io.emit(receiverChat, ChatListReceiver);
-
-//   // Notification
-//   const allUnReaddMessage = await Message.countDocuments({
-//     receiver: result.sender,
-//     seen: false,
-//   });
-//   const variable = 'new-notifications::' + result.sender;
-//   io.emit(variable, allUnReaddMessage);
-//   const allUnReaddMessage2 = await Message.countDocuments({
-//     receiver: result.receiver,
-//     seen: false,
-//   });
-//   const variable2 = 'new-notifications::' + result.receiver;
-//   io.emit(variable2, allUnReaddMessage2);
-
-//   //end Notification//
-//   callbackFn(callback, {
-//     statusCode: httpStatus.OK,
-//     success: true,
-//     message: 'Message sent successfully!',
-//     data: result,
-//   });
-// });
-// ================== send message functionlity end ========================
+ 
+};

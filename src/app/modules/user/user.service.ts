@@ -13,6 +13,7 @@ import { USER_ROLE } from './user.constants';
 import { DeleteAccountPayload, TUser, TUserCreate } from './user.interface';
 import { User } from './user.models';
 import Booking from '../booking/booking.model';
+import { verifiedUserNotify } from '../../../socketio';
 
 export type IFilter = {
   searchTerm?: string;
@@ -928,6 +929,9 @@ const verifyUserByAdmin = async (id: string) => {
   if (!user) {
     throw new AppError(httpStatus.BAD_REQUEST, 'user verified failed');
   }
+
+
+  verifiedUserNotify({userId: id})
 
 
 

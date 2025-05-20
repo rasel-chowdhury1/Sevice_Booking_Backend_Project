@@ -20,6 +20,9 @@ const client = twilio(accountSid, authToken);
 
 // login
 const login = catchAsync(async (req: Request, res: Response) => {
+
+  console.log("login data ->> ", req.body)
+  
   const result = await authServices.login(req.body);
   const cookieOptions: any = {
     secure: false,
