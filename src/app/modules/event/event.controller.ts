@@ -13,7 +13,7 @@ const createEvent = catchAsync(async (req: Request, res: Response) => {
       // Check if there are uploaded files
       let filePaths: { [fieldName: string]: string[] } = {};
       if (req.files) {
-        filePaths = storeFiles('event', req.files as { [fieldName: string]: Express.Multer.File[] });
+        filePaths = storeFiles('events', req.files as { [fieldName: string]: Express.Multer.File[] });
       }
   
       console.log('==== file paths =====', filePaths);
