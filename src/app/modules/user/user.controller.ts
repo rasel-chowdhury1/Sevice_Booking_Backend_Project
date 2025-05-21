@@ -241,16 +241,16 @@ const getNearestGuidesAndEvents = catchAsync(
     let events;
 
     // Destructure lat and long from query parameters
-  const { lat, long } = req.query;
+  // const { lat, long } = req.query;
 
   // Prepare data with latitude and longitude
   const data: { latitude?: number, longitude?: number } = {};
 
   // If lat and long are provided, convert them to numbers and assign to data
-  if (lat && long) {
-    data.latitude = parseFloat(lat as string);
-    data.longitude = parseFloat(long as string);
-  }
+  // if (lat && long) {
+  //   data.latitude = parseFloat(lat as string);
+  //   data.longitude = parseFloat(long as string);
+  // }
 
 
     if (role === 'seeker') {
