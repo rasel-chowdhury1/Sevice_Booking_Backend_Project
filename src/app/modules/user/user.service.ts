@@ -14,6 +14,7 @@ import { DeleteAccountPayload, TUser, TUserCreate } from './user.interface';
 import { User } from './user.models';
 import Booking from '../booking/booking.model';
 import { verifiedUserNotify } from '../../../socketio';
+import { late } from 'zod';
 
 export type IFilter = {
   searchTerm?: string;
@@ -333,7 +334,9 @@ const getNearestGuides = async (userId: string, currentLocation?: { latitude?: n
       status: { $nin: ['done', 'cancelled'] }, // Exclude 'done' & 'cancelled' bookings
     }).distinct('guide_id'); // Get unique guide IDs
 
-    console.log({ activeBookings });
+    console.log({ activeBookings }); 
+
+    console.log({longitude, latitude})
 
     // 3️⃣ Query nearest guides
     const guides = await User.aggregate([

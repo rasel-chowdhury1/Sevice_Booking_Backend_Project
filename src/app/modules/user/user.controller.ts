@@ -213,10 +213,10 @@ const getNearestGuides = catchAsync(async (req: Request, res: Response) => {
   const data: { latitude?: number, longitude?: number } = {};
 
   // If lat and long are provided, convert them to numbers and assign to data
-  if (lat && long) {
-    data.latitude = parseFloat(lat as string);
-    data.longitude = parseFloat(long as string);
-  }
+  // if (lat && long) {
+  //   data.latitude = parseFloat(lat as string);
+  //   data.longitude = parseFloat(long as string);
+  // }
 
 
   // Call the service to get nearest guides
