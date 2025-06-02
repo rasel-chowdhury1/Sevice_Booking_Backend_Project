@@ -23,6 +23,10 @@ const userSchema = new Schema<TUser>(
       type: String,
       enum: Role,
     },
+    mainRole: {
+      type: String,
+      enum: Role,
+    },
     password: {
       type: String,
       required: true,

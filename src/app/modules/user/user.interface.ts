@@ -21,6 +21,7 @@ export interface TUserCreate {
   phoneCountryCode?: string;
   phone?: string;
   role: (typeof USER_ROLE)[keyof typeof USER_ROLE];
+  mainRole: (typeof USER_ROLE)[keyof typeof USER_ROLE];
   about?: string;
   gender?: (typeof gender)[keyof typeof gender];
   document?: string;

@@ -38,6 +38,12 @@ userRoutes
     parseData(),
     userController.updateMyProfile,
   )
+
+  .patch(
+    "/change-role",
+    auth(USER_ROLE.SEEKER, USER_ROLE.GUIDE),
+    userController.changeRole
+  )
   // check email is exist route
   .get('/email-exist', userController.isUserEmailExist)
 

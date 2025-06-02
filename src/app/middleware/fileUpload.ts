@@ -87,7 +87,7 @@ const fileUpload = (uploadDirectory: string) => {
       if (parts.length > 1) {
         extension = '.' + parts.pop();
       }
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      const uniqueSuffix = '-' + Math.round(Math.random() * 1e9);
       cb(
         null,
         parts.shift()!.replace(/\s+/g, '_') + '-' + uniqueSuffix + extension,

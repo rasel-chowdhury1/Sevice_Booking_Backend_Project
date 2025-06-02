@@ -14,7 +14,8 @@ import { DeleteAccountPayload, TUser, TUserCreate } from './user.interface';
 import { User } from './user.models';
 import Booking from '../booking/booking.model';
 import { verifiedUserNotify } from '../../../socketio';
-import { late } from 'zod';
+const supportEmail = config.support_email;
+const supportPhone = config.support_phone;
 
 export type IFilter = {
   searchTerm?: string;
@@ -161,6 +162,7 @@ const otpVerifyAndCreateUser = async ({
     password,
     email,
     role,
+    mainRole: role
   };
 
   const isExist = await User.isUserExist(email as string);
@@ -1005,6 +1007,51 @@ const unBlockedUser = async (id: string) => {
   return user;
 };
 
+
+const changeRole = async (user_id: string, role: string) => {
+  const updateUser = await User.findByIdAndUpdate(
+    user_id,
+    { role },
+    { new: true }
+  );
+
+  if (!updateUser) {
+
+    throw new AppError(httpStatus.BAD_REQUEST, 'User not found or update failed');
+  }
+
+  const jwtPayload = {
+    userId: updateUser._id.toString(),
+    role: updateUser.role,
+    fullName: updateUser.fullName,
+    email: updateUser.email,
+    phone: updateUser.phone,
+  };
+
+  const accessToken = createToken({
+    payload: jwtPayload,
+    access_secret: config.jwt_access_secret as string,
+    expity_time: config.jwt_access_expires_in as string,
+  });
+
+  const refreshToken = createToken({
+    payload: jwtPayload,
+    access_secret: config.jwt_refresh_secret as string,
+    expity_time: config.jwt_refresh_expires_in as string,
+  });
+
+  return {
+    user: updateUser,
+    accessToken,
+    refreshToken,
+    support: {
+      email: supportEmail,
+      phone: supportPhone,
+    },
+  };
+};
+
+
 export const userService = {
   createUserToken,
   otpVerifyAndCreateUser,
@@ -1026,5 +1073,6 @@ export const userService = {
   getUserStatistics,
   getYearlyUserOverview,
   getIslookingGuideOfSeekers,
-  getUserWallet
+  getUserWallet,
+  changeRole
 };

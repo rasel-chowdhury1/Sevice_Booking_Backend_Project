@@ -520,6 +520,24 @@ const deleteMyAccount = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const changeRole = catchAsync(async (req: Request, res: Response) => {
+ 
+  console.log('====== req body data ======', req.body);
+
+  const {role} = req.body;
+
+  const result = await userService.changeRole(req?.user?.userId, role);
+
+  console.log('====== update profile data result ======', result);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Role changed successfully',
+    data: result,
+  });
+});
+
 export const userController = {
   createUser,
   getNearestGuidesAndEvents,
@@ -546,5 +564,6 @@ export const userController = {
   getIslookingGuideOfSeekers,
   getUserWallet,
   blockUserByAdmin,
-  unBlockUserByAdmin
+  unBlockUserByAdmin,
+  changeRole
 };
