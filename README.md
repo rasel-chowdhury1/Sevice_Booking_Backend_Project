@@ -131,16 +131,16 @@ Users can switch between **Seeker** and **Guide** roles without creating a new a
 ---
 🧪 Development & Testing
 To set up the project locally for development:
-# Clone the repository
+### Clone the repository
 git clone https://github.com/rasel-chowdhury1/Sevice_Booking_Backend_Project
 
-# Navigate to the project directory
+### Navigate to the project directory
 cd Sevice_Booking_Backend_Project
 
-# Install all dependencies
+### Install all dependencies
 npm install
 
-# Start the development server
+### Start the development server
 npm run dev
 ⚠️ Note: Make sure you have a .env file configured with the necessary environment variables before running the server. You can refer to the .env.example file if available or contact the project maintainer for required keys.
 
