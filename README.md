@@ -133,7 +133,7 @@ Users can switch between **Seeker** and **Guide** roles without creating a new a
 ## 🧪 Development & Testing
 
 git clone https://github.com/rasel-chowdhury1/Sevice_Booking_Backend_Project
-cd Sevice_Booking_Backend_Project
+- cd Sevice_Booking_Backend_Project
 
 # Install dependencies
 npm install
