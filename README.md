@@ -129,15 +129,18 @@ Users can switch between **Seeker** and **Guide** roles without creating a new a
 📫 [View full Postman API Documentation](https://documenter.getpostman.com/view/40841938/2sB34kDeA9)
 
 ---
-
-## 🧪 Development & Testing
-
+🧪 Development & Testing
+To set up the project locally for development:
+# Clone the repository
 git clone https://github.com/rasel-chowdhury1/Sevice_Booking_Backend_Project
-- cd Sevice_Booking_Backend_Project
 
-# Install dependencies
+# Navigate to the project directory
+cd Sevice_Booking_Backend_Project
+
+# Install all dependencies
 npm install
 
-# Start the server 
+# Start the development server
 npm run dev
+⚠️ Note: Make sure you have a .env file configured with the necessary environment variables before running the server. You can refer to the .env.example file if available or contact the project maintainer for required keys.
 
