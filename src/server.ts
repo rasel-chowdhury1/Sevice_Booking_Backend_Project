@@ -12,8 +12,24 @@ export const io = initializeSocketIO(createServer(app));
 
 async function main() {
   try {
-    // Connect to MongoDB
-    const result = await mongoose.connect(config.database_url as string);
+
+    const dbStartTime = Date.now();
+    const loadingFrames = ["🌍", "🌎", "🌏"]; // Loader animation frames
+    let frameIndex = 0;
+
+    // Start the connecting animation
+    const loader = setInterval(() => {
+      process.stdout.write(
+        `\rMongoDB connecting ${loadingFrames[frameIndex]} Please wait 😢`,
+      );
+      frameIndex = (frameIndex + 1) % loadingFrames.length;
+    }, 300); // Update frame every 300ms
+
+        // Connect to MongoDB with a timeout
+    await mongoose.connect(config.database_url as string, {
+      connectTimeoutMS: 10000, // 10 seconds timeout
+    });
+
 
     createDefaultAdmin();
   

@@ -138,18 +138,6 @@ userRoutes
   .get('/:id', userController.getUserById)
 
 
-  // .patch(
-  //   '/update-my-profile',
-  //   auth(
-  //     USER_ROLE.SEEKER,
-  //     USER_ROLE.ADMIN,
-  //     USER_ROLE.GUIDE,
-  //   ),
-  //   upload.single('image'),
-  //   parseData(),
-  //   userController.updateMyProfile,
-  // )
-
 
 
   .put('/block/:id', auth(USER_ROLE.ADMIN), userController.blockedUser)
@@ -164,6 +152,18 @@ userRoutes
 
 
 
+
+  // .patch(
+  //   '/update-my-profile',
+  //   auth(
+  //     USER_ROLE.SEEKER,
+  //     USER_ROLE.ADMIN,
+  //     USER_ROLE.GUIDE,
+  //   ),
+  //   upload.single('image'),
+  //   parseData(),
+  //   userController.updateMyProfile,
+  // )
 
 
 

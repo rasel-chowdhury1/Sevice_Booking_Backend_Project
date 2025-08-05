@@ -10,17 +10,32 @@ import globalErrorHandler from './app/middleware/globalErrorhandler';
 import router from './app/routes';
 import notFound from './app/middleware/notfound';
 import { logHttpRequests } from './app/utils/logger';
-import { order } from 'paypal-rest-sdk';
+import rateLimit from 'express-rate-limit';
+
+
 const app: Application = express();
+
+
+// 👮 Rate Limiter Middleware (apply to all requests)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000000, // limit each IP to 100 requests per 15 min
+  message: "🚫 Too many requests from this IP. Please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use(limiter); // 👈 Add before your routes
+
 app.use(logHttpRequests);
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
 const allowedOrigins = [
-  'http://localhost:9000', // Allow only this origin for credentials
+  'http://10.10.10.32:9000', // Allow only this origin for credentials
   'http://204.197.173.195:9000',
   'http://204.197.173.195:4173',
-  'https://gydes.netlify.app'
+  'https://gydes.netlify.app',
+  'http://203.161.60.189:3010'
   // Add any other allowed origins here
 ];
 //parsers
