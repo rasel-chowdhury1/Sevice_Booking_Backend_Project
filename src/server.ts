@@ -6,6 +6,7 @@ import config from './app/config';
 import initializeSocketIO from './socketio';
 import createDefaultAdmin from './app/DB/createDefaultAdmin';
 import cronJob from './app/utils/cronJob';
+import { logger } from './app/utils/logger';
 
 let server: Server;
 export const io = initializeSocketIO(createServer(app));
@@ -30,6 +31,11 @@ async function main() {
       connectTimeoutMS: 10000, // 10 seconds timeout
     });
 
+
+    // Stop the connecting animation
+    clearInterval(loader);
+    
+    logger.info(`\r✅ Mongodb connected successfully in ${Date.now() - dbStartTime}ms`);
 
     createDefaultAdmin();
   
