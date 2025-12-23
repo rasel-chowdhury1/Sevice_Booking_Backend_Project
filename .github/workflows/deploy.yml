@@ -1,0 +1,46 @@
+name: Deploy Backend to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup SSH and validate secrets
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            export PATH=$PATH:/usr/bin:/usr/local/bin:/root/.local/share/fnm/node-versions/v24.12.0/installation/bin
+
+            cd /application/Sevice_Booking_Backend_Project || exit 1
+
+            git fetch --all
+            git reset --hard origin/main
+
+            npm install
+
+            if pm2 describe Backend > /dev/null 2>&1; then
+                pm2 restart Backend
+            else
+                pm2 start npm --name "Backend" -- run dev
+            fi
+
+            pm2 save
+
+            echo "✅ Deployment finished!"
