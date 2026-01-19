@@ -19,6 +19,7 @@ import { notificationRoutes } from '../modules/notification/notification.route';
 import { withdrawRequestRoutes } from '../modules/WithdrawRequest/withdrawRequest.route';
 import { paymentRoutes } from '../modules/payment/payment.route';
 import { settingsRoutes } from '../modules/setting/setting.route';
+import { staticPagesRoutes } from '../modules/staticPages/staticPages.route';
 
 const router = Router();
 
@@ -106,6 +107,10 @@ const moduleRoutes = [
   {
     path: "/contactUs",
     route: ContactUsRoutes
+  },
+  {
+    path: "/static",
+    route: staticPagesRoutes
   }
 ];
 
