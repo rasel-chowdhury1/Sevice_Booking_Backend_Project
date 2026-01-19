@@ -74,16 +74,11 @@ export const getStaticAccountDeletePolicy = (_req: Request, res: Response) => {
   </div>
 
   <div class="step">
-    <h2>Step 3: Verify Your Identity</h2>
+    <h2>Step 3: Verify Your Identity && Confirm Deletion</h2>
     <p>Enter your password or complete the verification step shown on screen.</p>
     <img src="/uploads/static/deleteAccount.png" alt="Verify Identity" class="illustration">
   </div>
 
-  <div class="step">
-    <h2>Step 4: Confirm Deletion</h2>
-    <p>Tap <strong>Confirm Delete</strong>. Your account will be logged out and scheduled for permanent deletion.</p>
-    <img src="/uploads/static/deleteAccount.png" alt="Confirm Deletion" class="illustration">
-  </div>
 
   <div class="step">
     <h2>After Account Deletion</h2>
