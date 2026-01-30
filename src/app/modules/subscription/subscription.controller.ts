@@ -21,7 +21,7 @@ const addSubscription = catchAsync(async (req: Request, res: Response) => {
     
     req.body.created = userId;
 
-    console.log("===== req body ====> >>>> ", req.body)
+
 
     const newSubscription = await subscriptionService.addSubscription(req.body)
 

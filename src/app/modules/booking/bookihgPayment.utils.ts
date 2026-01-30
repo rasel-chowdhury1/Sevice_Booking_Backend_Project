@@ -58,12 +58,11 @@ export const createCheckoutSessionUsingPaypalForBooking = async (
       ],
     };
 
-    console.log('payment -:>>>>>', payment);
+
 
     return new Promise<string>((resolve, reject) => {
       PaypalUtils().payment.create(payment, (error: any, payment: any) => {
         if (error) {
-          console.log('=== paypal payment error ==>>>>> ', error);
           reject(new AppError(httpStatus.NOT_FOUND, 'User not found'));
         } else {
           for (let i = 0; i < payment.links.length; i++) {

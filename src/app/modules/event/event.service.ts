@@ -90,14 +90,12 @@ const getNearestEvents = async (userId: string, currentLocation?: { latitude?: n
         if (currentLocation?.latitude && currentLocation?.longitude) {
           latitude = currentLocation.latitude;
           longitude = currentLocation.longitude;
-          console.log('Using currentLocation from request');
         } else if (
           user.location &&
           user.location.coordinates &&
           user.location.coordinates.length === 2
         ) {
           [longitude, latitude] = user.location.coordinates;
-          console.log('Using location from user profile');
         } else {
           throw new AppError(
             httpStatus.BAD_REQUEST,
@@ -355,12 +353,11 @@ const getFeatureEventsForUser = async (userId: string) => {
 
 // ============== get created events start ==============
 const getMyCreatedEvents = async (userId: string) => {
-  console.log('========= user id === ', userId);
 
   try {
     const event = await Event.find({ createdBy: userId, isDeleted: false }); // Ensure isDeleted is false
 
-    console.log('===== My event === ', event);
+
 
     if (!event) {
       throw new AppError(
@@ -502,7 +499,7 @@ const getEventById = async (eventId: string): Promise<IEvent> => {
   }
 };
 
-const deleteEvent = async (user_id: string, eventId: string): Promise<void> => {
+const deleteEvent = async (user_id: string, eventId: string, role: string): Promise<void> => {
   try {
     const event = await Event.findById(eventId);
 
@@ -513,7 +510,7 @@ const deleteEvent = async (user_id: string, eventId: string): Promise<void> => {
     }
 
      // Ensure that only the creator of the event can delete it
-     if (event.createdBy.toString() !== user_id) {
+     if ( role !== 'admin' && event.createdBy.toString() !== user_id) {
       throw new AppError(httpStatus.FORBIDDEN, 'You are not authorized to delete this event.');
     }
 

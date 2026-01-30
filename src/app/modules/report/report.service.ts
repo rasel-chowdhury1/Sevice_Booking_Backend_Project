@@ -98,7 +98,7 @@ const banUserByAdmin = async (id:string, payload: { userId: string; reportId: st
 const getAllReports = async (query: Record<string, unknown>) => {
   try {
 
-     console.log({query})
+
 
       let modelQuery = Report.find(); // Base query
 
@@ -121,11 +121,9 @@ const getAllReports = async (query: Record<string, unknown>) => {
       // Search for `reportId.fullName` after execution
       if (query.fullName) {
         const searchTerm = query.fullName.toString().toLowerCase();
-        console.log("======>>> searchTerm =====  ", searchTerm);
 
         reports = reports.filter((report: any) => {
           const fullName = report?.reportId?.fullName?.toLowerCase();
-          console.log("===>>>>", fullName);
           
           // ✅ Return true if fullName includes the search term
           return fullName.includes(searchTerm);

@@ -9,18 +9,17 @@ interface AuthenticatedSocket extends Socket {
 }
 
 const socketAuthMiddleware = (socket: AuthenticatedSocket, next: (err?: Error) => void) => {
-  console.log("token---execute>>>> ", );
+
   // Retrieve token from different possible locations
   const token =
     socket.handshake.headers.token as any;
 
-    console.log("token---execute>>>> ", socket.handshake.headers);
+
 
   if (!token) {
     return next(new Error("Authentication error: Token not provided."));
   }
 
-  console.log("token--->>>> ", token);
 
   // Verify the token
   jwt.verify(token, config.jwt_access_secret as string, (err: any, decoded: any) => {
@@ -38,7 +37,7 @@ const socketAuthMiddleware = (socket: AuthenticatedSocket, next: (err?: Error) =
 
     socket.decodedToken = decoded; // Attach decoded token to the socket
 
-    console.log("socket decode token", socket.decodedToken)
+
     next();
   });
 };

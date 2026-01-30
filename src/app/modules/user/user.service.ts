@@ -30,7 +30,7 @@ export interface OTPVerifyAndCreateUserProps {
 
 // ====================== create user token start ================================
 const createUserToken = async (payload: TUserCreate) => {
-  console.log('payload service user');
+
   const { role, email, fullName, password, phone, about } = payload;
 
   // user role check
@@ -114,7 +114,7 @@ const createUserToken = async (payload: TUserCreate) => {
     expity_time: config.otp_token_expire_time as string | number,
   });
 
-  console.log({ createUserToken });
+
 
   return createUserToken;
 };
@@ -176,7 +176,7 @@ const otpVerifyAndCreateUser = async ({
 
   const user = await User.create(userData);
 
-  console.log('user service otp: -> ', user);
+
 
   if (!user) {
     throw new AppError(httpStatus.BAD_REQUEST, 'User creation failed');
@@ -204,7 +204,7 @@ const otpVerifyAndCreateUser = async ({
 
 // ====================== update user without role, email,isActive,isDeleted, password,  start ==========================
 const updateUser = async (id: string, payload: Partial<TUser>) => {
-  console.log("payload update user --->>> ", payload)
+
   const {
     role,
     email,
@@ -219,24 +219,24 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
     ...rest
   } = payload;
 
-  console.log("rest date -->>>>>>>>> ", rest)
+
 
 
   let delPhotos = deletePhotos;
   
   if (longitude !== undefined && latitude !== undefined) {
-    console.log("lang-lattitude ==>>> ", longitude,latitude)
+
     rest.location = {
       type: 'Point',
       coordinates: [parseFloat(longitude), parseFloat(latitude)],
     };
-    console.log("rest date 2 -->>>>>>>>> ", rest)
+
   }
   
   // Fetch the existing user to get current photos
   const existingUser = (await User.findById(id)) as TUser | null;
 
-  console.log("existing User -->>> ", existingUser);
+
 
   if (!existingUser) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
@@ -272,15 +272,14 @@ const updateUser = async (id: string, payload: Partial<TUser>) => {
     rest.interests = JSON.parse(rest.interests);
   }
 
-  console.log("user rest data --->>>", rest);
+
 
 
   const user = await User.findByIdAndUpdate(id, rest, { new: true });
 
-console.log("user 0-->> ", user);
+
 
   if (!user) {
-    console.log("throw error from this --->>> ", user)
     throw new AppError(httpStatus.BAD_REQUEST, 'User updating failed');
   }
 
@@ -291,7 +290,6 @@ console.log("user 0-->> ", user);
 
 
 const getUserWallet = async (id: string) => {
-  console.log('=== get specific user id ====>>> ', id);
   const result = await User.findById(id).select("wallet");
 
   if (!result) {
@@ -336,9 +334,7 @@ const getNearestGuides = async (userId: string, currentLocation?: { latitude?: n
       status: { $nin: ['done', 'cancelled'] }, // Exclude 'done' & 'cancelled' bookings
     }).distinct('guide_id'); // Get unique guide IDs
 
-    console.log({ activeBookings }); 
 
-    console.log({longitude, latitude})
 
     // 3️⃣ Query nearest guides
     const guides = await User.aggregate([
@@ -635,7 +631,7 @@ const getAllUserQuery = async (query: Record<string, unknown>) => {
   const meta = await userQuery.countTotal();
   // const result = await User.find({ isSubcription:false} );
 
-  console.log(result,"-----------<>")
+
   return { meta, result };
 };
 
@@ -860,7 +856,7 @@ const getAllUserRatio = async (year: number) => {
 };
 
 const getUserById = async (id: string) => {
-  console.log('=== get specific user id ====>>> ', id);
+
   const result = await User.findById(id);
   if (!result) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
@@ -875,7 +871,7 @@ const getUserByEmail = async (email: string) => {
 };
 
 const getUserByRole = async (role: string) => {
-  console.log('get user by role ====> ', role);
+
   const result = await User.find({ role });
 
   return result;
@@ -884,7 +880,7 @@ const getUserByRole = async (role: string) => {
 const deleteMyAccount = async (id: string, payload: DeleteAccountPayload) => {
   const user: TUser | null = await User.IsUserExistById(id);
 
-  console.log('==== user data =-== ', { user });
+
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
@@ -960,7 +956,7 @@ const blockedUser = async (id: string) => {
   //   status = true;
   // }
   let status = !singleUser.isBlocked;
-  console.log('status', status);
+
   const user = await User.findByIdAndUpdate(
     id,
     { isBlocked: status },
@@ -993,7 +989,7 @@ const unBlockedUser = async (id: string) => {
   // }
 
   let status = !singleUser.isBlocked;
-  console.log('status', status);
+
   const user = await User.findByIdAndUpdate(
     id,
     { isBlocked: status },

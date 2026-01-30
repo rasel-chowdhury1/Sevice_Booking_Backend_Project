@@ -11,7 +11,6 @@ import { User } from './user.models';
 import Notification from '../notification/notification.model';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
-  console.log(req.body);
   const createUserToken = await userService.createUserToken(req.body);
 
   sendResponse(res, {
@@ -23,7 +22,7 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const createUserAdmin = catchAsync(async (req: Request, res: Response) => {
-  console.log(req.body);
+  
   req.body.role = 'admin';
   const createUserToken = await userService.createUserToken(req.body);
 
@@ -37,8 +36,6 @@ const createUserAdmin = catchAsync(async (req: Request, res: Response) => {
 
 
 const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
-  console.log('====== req files data ======', req.files);
-  console.log('====== req body data ======', req.body);
 
   // Check if there are uploaded files
   if (req.files) {
@@ -75,11 +72,11 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
     }
   }
 
-  console.log('====== req body data ======', req.body);
+
 
   const result = await userService.updateUser(req?.user?.userId, req.body);
 
-  console.log('====== update profile data result ======', result);
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -90,16 +87,16 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
 
 const isUserEmailExist = catchAsync(async (req, res) => {
   // const as = await User.findById('674db0fb690c8d666f6c3a1c');
-  console.log(req);
+
   const { email } = req.query;
-  console.log({ email });
+
 
   if (!email) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Please provide Email ...');
   }
 
   const result = await User.findOne({ email }).select('email phone');
-  console.log({ result });
+
   // const result = await User.find('674db0fb690c8d666f6c3a1c').populate(
   //   'mentorRegistrationId',
   // );
@@ -118,11 +115,11 @@ const isUserEmailExist = catchAsync(async (req, res) => {
 });
 
 const userCreateVarification = catchAsync(async (req, res) => {
-  console.log('..........1..........');
+
   const token = req.headers?.token as string;
-  console.log('======= token ======', token);
+
   const { otp } = req.body;
-  console.log('otp', otp);
+
   const newUser = await userService.otpVerifyAndCreateUser({ otp, token });
 
   return sendResponse(res, {
@@ -135,7 +132,7 @@ const userCreateVarification = catchAsync(async (req, res) => {
 
 const getUsersByRole = catchAsync(async (req: Request, res: Response) => {
   const { role } = req.params;
-  console.log({ role });
+
   const result = await userService.getUserByRole(role);
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -148,7 +145,7 @@ const getUsersByRole = catchAsync(async (req: Request, res: Response) => {
 const getUserWallet = catchAsync(async (req: Request, res: Response) => {
   const {userId} = req.user;
 
-  console.log("user id ->>>>>> ",{userId})
+
   const result = await userService.getUserWallet(userId);
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -162,7 +159,7 @@ const verifyUserByAdmin = catchAsync(async (req: Request, res: Response) => {
   
   const adminId = req.user.userId;
   const { userId } = req.params;
-  console.log({ userId });
+
 
   const result = await userService.verifyUserByAdmin(userId);
   
@@ -177,7 +174,7 @@ const verifyUserByAdmin = catchAsync(async (req: Request, res: Response) => {
 const blockUserByAdmin = catchAsync(async (req: Request, res: Response) => {
   
   const { userId } = req.params;
-  console.log({ userId });
+
 
   const result = await userService.blockedUser(userId);
   
@@ -234,7 +231,7 @@ const getNearestGuides = catchAsync(async (req: Request, res: Response) => {
 
 const getNearestGuidesAndEvents = catchAsync(
   async (req: Request, res: Response) => {
-    console.log('======= user data ====>>>>>> ', req.user);
+
     const { userId, role } = req.user;
     let users;
     let seekers = null;
@@ -412,7 +409,7 @@ const getAllPlusOneCount = catchAsync(async (req, res) => {
 
 
 const getUserStatistics = catchAsync(async (req, res) => {
-  console.log("get all user overviewo _>>>> ");
+
   const {userId} = req.user;
   const result = await userService.getUserStatistics();
 
@@ -425,7 +422,7 @@ const getUserStatistics = catchAsync(async (req, res) => {
 });
 
 const getYearlyUserOverview = catchAsync(async (req, res) => {
-  console.log("get all user overviewo _>>>> ");
+
 
   // Default to the current year if the 'year' query parameter is not provided
   const year = req.query.year ? parseInt(req.query.year as string) : new Date().getFullYear();
@@ -487,7 +484,7 @@ const getUserById = catchAsync(async (req: Request, res: Response) => {
 
 const getMyProfile = catchAsync(async (req: Request, res: Response) => {
 
-  console.log("get my profile -=->>>> ", req?.user?.userId)
+
   const result = await userService.getUserById(req?.user?.userId);
 
   
@@ -523,13 +520,12 @@ const deleteMyAccount = catchAsync(async (req: Request, res: Response) => {
 
 const changeRole = catchAsync(async (req: Request, res: Response) => {
  
-  console.log('====== req body data ======', req.body);
+
 
   const {role} = req.body;
 
   const result = await userService.changeRole(req?.user?.userId, role);
 
-  console.log('====== update profile data result ======', result);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

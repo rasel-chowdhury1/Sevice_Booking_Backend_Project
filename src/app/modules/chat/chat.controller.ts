@@ -4,10 +4,7 @@ import sendResponse from '../../utils/sendResponse';
 import { chatService } from './chat.service';
 
 const createChat = catchAsync(async (req: Request, res: Response) => {
-  console.log("--------------- create chat data before -------", req.body)
-  console.log("--------------- create chat data req.user data -------", req.user)
   req.body.participants.push(req.user.userId)
-  console.log("--------------- create chat data after -------", req.body)
 
   const chat = await chatService.createChat(req.body);
   sendResponse(res, {
@@ -22,8 +19,6 @@ const getMyChatList = catchAsync(async (req: Request, res: Response) => {
 
   const {userId} = req.user
 
-  console.log("=== my chat list === ",{userId})
-  console.log("=== my chat query === ",req.query)
   const result = await chatService.getMyChatList(userId, req.query);
   sendResponse(res, {
     statusCode: 200,

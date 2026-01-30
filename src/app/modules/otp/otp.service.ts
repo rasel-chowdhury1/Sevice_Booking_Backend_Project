@@ -34,18 +34,13 @@ const checkOtpByEmail = async (email: string) => {
     sentTo: email,
   });
 
-  console.log({ email });
 
-  console.log({ isExist });
 
   const isExpireOtp = await Otp.findOne({
     sentTo: email,
     expiredAt: { $lt: new Date() }, // Use the `$gt` operator for comparison
   });
 
-  console.log({ isExpireOtp });
-
-  console.log('.........');
 
   return { isExist, isExpireOtp };
 };
@@ -55,24 +50,19 @@ const checkOtpByNumber = async (phone: string) => {
     sentTo: phone,
   });
 
-  console.log({ phone });
 
-  console.log({ isExist });
 
   const isExpireOtp = await Otp.findOne({
     sentTo: phone,
     expiredAt: { $lt: new Date() }, // Use the `$gt` operator for comparison
   });
 
-  console.log({ isExpireOtp });
-
-  console.log('.........');
 
   return { isExist, isExpireOtp };
 };
 
 const otpMatch = async (email: string, otp: string) => {
-  console.log(email, otp);
+
   const isOtpMatch = await Otp.findOne({
     sentTo: email,
     otp,
@@ -80,7 +70,6 @@ const otpMatch = async (email: string, otp: string) => {
     expiredAt: { $gt: new Date() },
   });
 
-  console.log({ isOtpMatch });
 
   return isOtpMatch;
 };
@@ -89,7 +78,7 @@ const updateOtpByEmail = async (
   email: string,
   payload: Record<string, any>,
 ) => {
-  console.log(payload);
+
   const otpUpdate = await Otp.findOneAndUpdate(
     {
       sentTo: email,
@@ -106,15 +95,15 @@ const resendOtpEmail = async ({ token }: { token: string }) => {
     throw new AppError(httpStatus.BAD_REQUEST, 'Token not found');
   }
 
-  console.log('========  before verify token ======', token);
+
   const decodeData = verifyToken({
     token,
     access_secret: config.jwt_access_secret as string,
   });
-  console.log('========  before verify token ======');
+
   const { email } = decodeData;
 
-  console.log('resend otp email => ', { email });
+
 
   const { isExist, isExpireOtp } = await checkOtpByEmail(email);
 

@@ -7,9 +7,7 @@ import { reviewService } from './review.service';
 
 // Add a new review
 const addReview = catchAsync(async (req: Request, res: Response) => {
-  // console.log('====== req files data ======', req.files);
-  console.log('====== req users data ======', req.user);
-  console.log('====== req files data ======', req.file);
+
   req.body.user_id = req.user.userId;
 
   if (req.file) {
@@ -17,14 +15,12 @@ const addReview = catchAsync(async (req: Request, res: Response) => {
       // Handle the single uploaded file
       const filePath = storeFile('reviews', req.file.filename); // process a single file
 
-      console.log('==== file path =====', filePath);
 
       // Set image (single file)
       if (filePath) {
         req.body.imageUrl = filePath; // Assign the single file path
       }
 
-      console.log('body data =>>> ', req.body);
     } catch (error: any) {
       console.error('Error processing files:', error.message);
       return sendResponse(res, {
@@ -37,7 +33,6 @@ const addReview = catchAsync(async (req: Request, res: Response) => {
   }
 
   try {
-    console.log('==== add review data ==== ', req.body);
     const result = await reviewService.createReview(req.body);
     // Send success response
     sendResponse(res, {

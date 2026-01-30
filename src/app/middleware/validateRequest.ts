@@ -5,8 +5,6 @@ import catchAsync from '../utils/catchAsync';
 const validateRequest = (schema: AnyZodObject) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
-    console.log("=========before  body data ============== >>>>>>>>>>", req.body)
-
 
      // Preprocess the body data
      if (req.body.coHosts) {

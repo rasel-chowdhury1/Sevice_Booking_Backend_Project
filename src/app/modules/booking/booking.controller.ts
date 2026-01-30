@@ -69,7 +69,7 @@ const createBooking = catchAsync(async (req: Request, res: Response) => {
 
     const result = await bookingService.confirmPaymentForBooking(req.body)
 
-    console.log({result})
+
 
     // Send success response
     sendResponse(res, {
@@ -120,9 +120,9 @@ const createBooking = catchAsync(async (req: Request, res: Response) => {
 // })
 
 const confirmPaymentForBooking = catchAsync( async (req: Request, res: Response) => {
-  console.log("=== payemtn query --->>> ", req.query);
+
   const {userId, } = req.user;
-  console.log("===>>> booking ",req.body)
+
   const { paymentId, guide_id,amount, booking_date, booking_time, payment_method, booking_duration, duration_type} = req.body;
 
  
@@ -139,7 +139,6 @@ const confirmPaymentForBooking = catchAsync( async (req: Request, res: Response)
     payment_method 
   }
 
-  console.log({data})
 
   const paymentResult = await bookingService.confirmPaymentForBooking(data);
 
@@ -249,7 +248,7 @@ const doneBookingBySeeker = catchAsync(
   async (req: Request, res: Response) => {
     try {
 
-      console.log("===req.body ->>>>> ", req.body)
+
       const { userId, fullName} = req.user;
       const {notificationId} = req.body;
       const { bookingId } = req.params; 
@@ -306,7 +305,7 @@ const getBookingById = catchAsync(async (req: Request, res: Response) => {
 
 //Get my boookigs
 const getMyBookings = catchAsync(async (req: Request, res: Response) => {
-  console.log('get my bookings =====> ', req.user);
+
 
   if (!req.user || !req.user.userId) {
     sendResponse(res, {

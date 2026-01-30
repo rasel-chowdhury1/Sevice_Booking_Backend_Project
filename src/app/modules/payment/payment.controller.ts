@@ -46,7 +46,7 @@ export const getAllPayments = catchAsync(async (req: Request, res: Response): Pr
 });
 
 const getPaymentOverview = catchAsync(async (req, res) => {
-    console.log("get all payment overviewo _>>>> ");
+
   
     // Default to the current year if the 'year' query parameter is not provided
     const year = req.query.year ? parseInt(req.query.year as string) : new Date().getFullYear();

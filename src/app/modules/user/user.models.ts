@@ -243,7 +243,7 @@ userSchema.pre('findOne', function (next) {
 // });
 
 userSchema.statics.isUserExist = async function (email: string) {
-  console.log({ email });
+
   return await User.findOne({ email: email }).select('+password');
 };
 

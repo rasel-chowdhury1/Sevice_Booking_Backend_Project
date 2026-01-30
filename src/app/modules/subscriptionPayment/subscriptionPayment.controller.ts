@@ -40,7 +40,6 @@ const createPaymentSubscriptionByPaypal = catchAsync(
     const {amount, duration} = req.body;
 
 
-    console.log("+++++ req body data = >>> ", req.body);
 
     
 
@@ -67,7 +66,7 @@ const createPaymentSubscriptionByPaypal = catchAsync(
 );
 
 const confirmPaymentByPaypal = catchAsync(async (req: Request, res: Response) => {
-  console.log('====== before confirm payment ====>>> ', req.query);
+
   
   const { paymentId, userId, subcriptionId, amount, duration, token, PayerID } = req.query;
 
@@ -95,14 +94,13 @@ const confirmPaymentByPaypal = catchAsync(async (req: Request, res: Response) =>
 // paypal implement for payment === >>>>>> end -----
 
 const confirmPaymentSubcription = catchAsync(async (req: Request, res: Response) => {
-  console.log('====== before confirm payment ====>>> ', req.body);
+
 
   const {userId} = req.user;
   const { paymentId,subcriptionId, paymentType } = req.body;
 
   const isSubcription = await Subcription.findById(subcriptionId) as any;
 
-  console.log({isSubcription})
   
   if(!isSubcription){
     sendResponse(res, {
@@ -124,7 +122,7 @@ const confirmPaymentSubcription = catchAsync(async (req: Request, res: Response)
 
   const paymentResult = await SubcriptionPaymentService.confirmPaymentSubcription(data) || "";
 
-  console.log({paymentResult})
+ 
 
   if (paymentResult) {
     sendResponse(res, {

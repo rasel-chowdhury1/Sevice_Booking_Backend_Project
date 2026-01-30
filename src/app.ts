@@ -32,6 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const allowedOrigins = [
   'http://10.10.10.32:9000', // Allow only this origin for credentials
+  'http://10.10.10.38:9000', 
   'http://204.197.173.195:9000',
   'http://204.197.173.195:4173',
   'https://gydes.netlify.app',

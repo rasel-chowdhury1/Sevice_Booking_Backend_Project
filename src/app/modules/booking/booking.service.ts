@@ -175,7 +175,7 @@ const createPaymentByPaypalForBooking = async ( payload: any) => {
 // }
 const confirmPaymentForBooking = async (data: any) => {
 
-  console.log("data ____>>> ", data)
+
    const { paymentId, user_id, guide_id, booking_date, booking_time, total_price, payment_method, booking_duration, duration_type} = data;
 
    let paymentData;
@@ -227,7 +227,6 @@ const confirmPaymentForBooking = async (data: any) => {
     paymentData = new Payment(paymentDataBody);
     const result = await paymentData.save()
 
-    console.log("======== payment Data =====>>> ", result)
 
     // Convert AM/PM format to 24-hour format before saving (if needed)
     const formattedTime = convertTo24HourFormat(booking_time);
@@ -370,7 +369,7 @@ const updateBookingStatusByGuide = async (
 
 
     const isExistBooking = await Booking.findOne({_id: bookingId, guide_id: userId});
-    console.log("====== is exist booking ==== ", isExistBooking);
+
 
     if(!isExistBooking){
         throw new AppError(httpStatus.BAD_REQUEST, "You can not update this booking...")
@@ -448,7 +447,7 @@ const doneBookingStatusBySeeker = async (
   try {
 
     const isExistBooking = await Booking.findOne({_id: bookingId, user_id: userId});
-    console.log("====== is exist booking ==== ", isExistBooking);
+
 
     if(!isExistBooking){
         throw new AppError(httpStatus.BAD_REQUEST, "You can not update this booking...")

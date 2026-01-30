@@ -6,7 +6,7 @@ import Review from './review.model';
 import { createNotification } from '../notification/notification.utils';
 // Create a new review
 const createReview = async (reviewData: Partial<IReview>): Promise<IReview> => {
-  console.log('========== review Data ======= ', reviewData);
+
 
   // Check if review_id exists in User model
   const userExists = await User.findById(reviewData.review_id);
@@ -43,7 +43,7 @@ const createReview = async (reviewData: Partial<IReview>): Promise<IReview> => {
 
   await createNotification(notificationData);
   
-  console.log('======= saved review ======', savedReview);
+
 
   return savedReview;
 };
@@ -60,7 +60,7 @@ const getReviewsByReviewId = async (reviewId: string): Promise<IReview[]> => {
   const result = await Review.find({ review_id: reviewId })
     .populate('user_id', 'image fullName address')
     .exec();
-  console.log('====== result of review id === ', result);
+
   return result;
 };
 
@@ -72,7 +72,7 @@ const updateReviewById = async (
   const result = await Review.findByIdAndUpdate(payload.reviewId, updateData, {
     new: true,
   });
-  console.log({ result });
+
   return result;
 };
 

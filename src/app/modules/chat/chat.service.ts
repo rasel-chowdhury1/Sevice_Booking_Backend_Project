@@ -28,7 +28,6 @@ const createChat = async (payload: IChat) => {
   }).populate(['participants']);
 
 
-  console.log("==== already exists data from chat service ===>>> ", alreadyExists)
 
   if (alreadyExists) {
     return alreadyExists;
@@ -36,7 +35,7 @@ const createChat = async (payload: IChat) => {
 
   const result = Chat.create(payload);
 
-  console.log("==== already not exists data then created new chat ===>>> ", result)
+
 
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Chat creation failed');
@@ -48,8 +47,7 @@ const createChat = async (payload: IChat) => {
 // =========== Get my chat list start ===========
 const getMyChatList = async (userId: string, query: any) => {
 
-  console.log("=-====== user id ====== ", userId);
-  console.log("=-====== user query ====== ", query);
+
 
   // Build the query object to filter the chats
   const filterQuery: any = { participants: { $all: userId } };
@@ -64,7 +62,7 @@ const getMyChatList = async (userId: string, query: any) => {
       ...(query?.search && { fullName: { $regex: query.search, $options: 'i' } }) },
   });
 
-  console.log("======== chats ======== ", chats);
+
 
   if (!chats) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Chat list not found');
@@ -73,7 +71,7 @@ const getMyChatList = async (userId: string, query: any) => {
   const data = [];
   for (const chatItem of chats) {
 
-    console.log("chat items ==>>", chatItem.participants.length < 1)
+
     if(chatItem.participants.length < 1) return data;
     const chatId = chatItem?._id;
 
@@ -109,7 +107,7 @@ const getMyChatList = async (userId: string, query: any) => {
     return dateB - dateA;
   });
 
-  console.log({data})
+
 
   return data ;
 };

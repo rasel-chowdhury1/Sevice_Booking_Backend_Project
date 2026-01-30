@@ -17,9 +17,8 @@ const getSubscriptionByNamePriceAndDuration = async (subscriptionBody: ISubscrip
 const addSubscription = async (payload: ISubscription) => {
     // payload will be {created, name, price, month, features}
 
-    console.log("==== add subcriptioin ====>>>>>>> ")
     let oldSubs = await getSubscriptionByNamePriceAndDuration(payload);
-    console.log("==== add subcriptioin ====>>>>>>> ", oldSubs)
+
     if (oldSubs) {
         throw new AppError(httpStatus.CONFLICT, "Subscription already exists");
     }

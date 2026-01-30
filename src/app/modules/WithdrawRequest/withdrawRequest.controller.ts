@@ -52,7 +52,7 @@ const editWithdrawRequests = catchAsync(async (req: Request, res: Response): Pro
   // Get the withdraw request by ID
   const existingWithRequest = await withdrawRequestService.getWithdrawRequestsById(req.params.id);
 
-  console.log({existingWithRequest})
+ 
 
   // Check if the withdraw request exists
   if (!existingWithRequest) {
@@ -92,7 +92,6 @@ const editWithdrawRequests = catchAsync(async (req: Request, res: Response): Pro
     await existingWithRequest.save();  // Mongoose instance's `save` method
 
 
-    console.log("====>>> ", existingWithRequest);
     // If approved, deduct the amount from the wallet
     if (existingWithRequest.status === 'Approved') {
       const userData = await User.findById(existingWithRequest.user);
@@ -121,7 +120,7 @@ const editWithdrawRequests = catchAsync(async (req: Request, res: Response): Pro
 
       }
 
-      console.log("after user data ====>>> ", {userData});
+
 
       // Send notification to admin
       const message = `Your Withdraw request of $${existingWithRequest.amount} has been approved`;

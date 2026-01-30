@@ -19,7 +19,6 @@ const getContactUs = catchAsync(async (req: Request, res: Response) => {
 const updateContactUs = catchAsync(
   async (req: Request, res: Response) => {
     const updateData = req.body;
-    console.log('====== Contact us update request ==== >>> ', updateData);
 
     const result = await ContactUsService.updateContactUs(updateData);
     sendResponse(res, {

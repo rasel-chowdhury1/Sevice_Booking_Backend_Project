@@ -19,7 +19,7 @@ const verifyAccess = (...userRoles: string[]) => {
 
         const {adminVerified, isBlocked, role } = userData;
 
-        console.log({userData})
+
 
         
         if (!adminVerified) {

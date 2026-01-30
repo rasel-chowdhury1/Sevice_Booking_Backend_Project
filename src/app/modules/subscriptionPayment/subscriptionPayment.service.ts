@@ -39,7 +39,7 @@ const createPaymentByPaypal = async (payload: any) => {
 };
 
 const confirmPaymentByPaypal = async (data: any) => {
-  console.log('==== confirm payment data ===>>>>>n ', data);
+
   const { userId, subcriptionId, amount, duration, paymentIntentId, PayerID } = data;
 
   if (!paymentIntentId && !PayerID) {
@@ -52,7 +52,7 @@ const confirmPaymentByPaypal = async (data: any) => {
   try {
     const responseData = await retrievePayment(paymentIntentId, PayerID);
 
-    console.log("=== response data ===>>> ", responseData)
+
 
     if (responseData?.state !== 'approved') {
       throw new AppError(400, 'Payment not approved');
@@ -75,7 +75,7 @@ const confirmPaymentByPaypal = async (data: any) => {
       throw new AppError(httpStatus.BAD_REQUEST, 'Payment id already use');
     }
   
-    console.log('==== payment data body ===>>>> ', paymentDataBody);
+
 
     paymentData = new SubscriptionPayment(paymentDataBody);
     await paymentData.save();
@@ -123,7 +123,7 @@ const confirmPaymentByPaypal = async (data: any) => {
 
 // ======= confirm payment start =====
 const confirmPaymentSubcription = async(data: any) => {
-  console.log('==== confirm payment data ===>>>>>n ', data);
+
   const { userId, subcriptionId, amount, duration, paymentIntentId, paymentMethod} = data;
 
   if (!paymentIntentId ) {
@@ -154,7 +154,7 @@ const confirmPaymentSubcription = async(data: any) => {
       throw new AppError(httpStatus.BAD_REQUEST, 'Payment id already use');
     }
   
-    console.log('==== payment data body ===>>>> ', paymentDataBody);
+
 
     paymentData = new Payment(paymentDataBody);
     await paymentData.save();

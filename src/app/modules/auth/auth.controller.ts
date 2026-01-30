@@ -21,7 +21,7 @@ const client = twilio(accountSid, authToken);
 // login
 const login = catchAsync(async (req: Request, res: Response) => {
 
-  console.log("login data ->> ", req.body)
+
   
   const result = await authServices.login(req.body);
   const cookieOptions: any = {
@@ -46,10 +46,9 @@ const login = catchAsync(async (req: Request, res: Response) => {
 
 // change password
 const changePassword = catchAsync(async (req: Request, res: Response) => {
-  console.log("exist change password....");
+
   const { userId } = req?.user;
   const { newPassword, oldPassword } = req.body;
-  console.log({userId, newPassword, oldPassword });
 
   const result = await authServices.changePassword({
     userId,
@@ -71,13 +70,11 @@ const forgotPassword = catchAsync(async (req: Request, res: Response) => {
   // console.log(req?.body?.email);
   const { email, phoneNumber } = req.body;
 
-  console.log({email})
-  console.log({phoneNumber})
+
 
   let result;
   
   if(email){
-    console.log("email if exists")
     result = await authServices.forgotPasswordByEmail(email);
   }
   else{
@@ -116,7 +113,6 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
 
   const { newPassword, confirmPassword } = req.body;
 
-  console.log(newPassword, confirmPassword);
 
   const result = await authServices.resetPassword({
     token,

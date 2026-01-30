@@ -6,8 +6,7 @@ import { storeFiles } from '../../utils/fileHelper';
 import { eventService } from './event.service';
 
 const createEvent = catchAsync(async (req: Request, res: Response) => {
-    console.log('====== req files data ======', req.files);
-    console.log('====== req users data ======', req.user);
+
   
     try {
       // Check if there are uploaded files
@@ -16,17 +15,16 @@ const createEvent = catchAsync(async (req: Request, res: Response) => {
         filePaths = storeFiles('events', req.files as { [fieldName: string]: Express.Multer.File[] });
       }
   
-      console.log('==== file paths =====', filePaths);
+
   
       // Process and assign uploaded files to `req.body`
       req.body.bannerImage = filePaths.bannerImage ? filePaths.bannerImage[0] : undefined;
       req.body.descriptionImage = filePaths.descriptionImage ? filePaths.descriptionImage[0] : undefined;
 
-      console.log('raw coHosts:', req.body.coHosts); // Log raw coHosts string
+
       try {
         // const parsedCoHosts = JSON.parse(req.body.coHosts);
         const parsedCoHosts = req.body.coHosts;
-        console.log('parsed coHosts:', parsedCoHosts); // Log parsed coHosts
     
         req.body.coHosts = parsedCoHosts.map((coHost: any, index: number) => {
           coHost.image = filePaths.coHostImages ? filePaths.coHostImages[index] : null;
@@ -47,7 +45,7 @@ const createEvent = catchAsync(async (req: Request, res: Response) => {
 
       req.body.createdBy = req.user.userId;
   
-      console.log('body data =>>> ', req.body);
+
   
     //   // Pass the processed data to the service layer
       const result = await eventService.createEvent(req.body);
@@ -134,7 +132,7 @@ const getMyCreatedEvents = catchAsync(async (req: Request, res: Response) => {
   });
 
 const updateEvent = catchAsync(async (req: Request, res: Response) => {
-    console.log('====== req users data ======', req.user);
+
   
     try {
       const {eventId} = req.params; // Extract event ID from route params
@@ -145,7 +143,7 @@ const updateEvent = catchAsync(async (req: Request, res: Response) => {
         filePaths = storeFiles('events', req.files as { [fieldName: string]: Express.Multer.File[] });
       }
   
-      console.log('==== file paths =====', filePaths);
+
   
       // Process and assign uploaded files to `req.body`
       if (filePaths.bannerImage) {
@@ -155,11 +153,11 @@ const updateEvent = catchAsync(async (req: Request, res: Response) => {
         req.body.descriptionImage = filePaths.descriptionImage[0];
       }
   
-      console.log('raw coHosts:', req.body.coHosts); // Log raw coHosts string
+
       try {
         // Parse coHosts if provided
         const parsedCoHosts = req.body.coHosts ? JSON.parse(req.body.coHosts) : [];
-        console.log('parsed coHosts:', parsedCoHosts); // Log parsed coHosts
+
   
         req.body.coHosts = parsedCoHosts.map((coHost: any, index: number) => {
           coHost.image = filePaths.coHostImages ? filePaths.coHostImages[index] : coHost.image;
@@ -168,8 +166,7 @@ const updateEvent = catchAsync(async (req: Request, res: Response) => {
       } catch (error) {
         console.error('Error parsing coHosts:', error); // Log any JSON parse errors
       }
-  
-      console.log('body data =>>> ', req.body);
+
   
       // Pass the processed data to the service layer
       const result = await eventService.updateEvent(eventId, req.body);
@@ -195,7 +192,7 @@ const updateEvent = catchAsync(async (req: Request, res: Response) => {
 const getAllEvents = catchAsync(async (req: Request, res: Response) => {
     const events = await eventService.getAllEvents(req.query);
   
-    console.log("===== all events === >>>>>>>> ", events)
+
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -221,9 +218,10 @@ const getEventById = catchAsync(async (req: Request, res: Response) => {
 
 const deleteEvent = catchAsync(async (req: Request, res: Response) => {
   const {eventId} = req.params;
-  const {userId} = req.user;
+  const {userId, role} = req.user;
 
-  await eventService.deleteEvent(userId, eventId);
+
+  await eventService.deleteEvent(userId, eventId, role);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

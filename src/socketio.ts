@@ -40,7 +40,6 @@ const initializeSocketIO = (server: HttpServer) => {
   io.use(socketAuthMiddleware);
 
   io.on('connection', async (socket) => {
-    console.log('connected', socket?.id);
 
     // =================== try catch 1 start ================
     try {
@@ -54,7 +53,7 @@ const initializeSocketIO = (server: HttpServer) => {
 
       const user: any = (socket as any)?.decodedToken;
 
-      console.log("user -->>> ", user)
+
 
       //==================== check user is not exist  =======================
       if (!user) {
@@ -96,8 +95,7 @@ const initializeSocketIO = (server: HttpServer) => {
           const userIdObject = new mongoose.Types.ObjectId(user.userId);
 
           //chat.participants is userIds array like ['userId1', 'userId2']. then some method returns true if at least one element in the array satisfies the given condition.
-          console.log('=== before user id =====', user.userId);
-          console.log('===== participant ===== ', chat.participants);
+
 
           const isParticipant = chat.participants.some((participant) =>
             participant.equals(userIdObject),
@@ -394,7 +392,6 @@ const initializeSocketIO = (server: HttpServer) => {
             { $set: { seen: true } },
           );
 
-          console.log('=============== updated message +++ > ', updateMessages);
 
           const user1 = chatList.participants[0];
           const user2 = chatList.participants[1];
@@ -413,7 +410,7 @@ const initializeSocketIO = (server: HttpServer) => {
 
           const user2Chat = 'chat-list::' + user2;
 
-          console.log({ user1Chat, user2Chat });
+
 
           const allUnReaddMessage = await Message.countDocuments({
             receiver: user1,
@@ -459,7 +456,6 @@ const initializeSocketIO = (server: HttpServer) => {
           success: true,
           typingUserId: user?.userId,
         };
-        console.log('==== message === ', result);
 
         io.emit(chat, result);
         callbackFn(callback, result);
@@ -484,7 +480,7 @@ const initializeSocketIO = (server: HttpServer) => {
 
       // ==================== using testing purpuse below this code start =================
       socket.on('check', (data, callback) => {
-        console.log(data);
+
 
         callbackFn(callback, { success: true, result: data });
       });

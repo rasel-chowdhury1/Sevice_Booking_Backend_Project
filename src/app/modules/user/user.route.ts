@@ -57,29 +57,29 @@ userRoutes
   // nearest guide of user
   .get(
     '/nearest-guides',
-    auth(USER_ROLE.SEEKER),
+    auth(USER_ROLE.SEEKER, USER_ROLE.ADMIN, USER_ROLE.GUIDE),
     userController.getNearestGuides,
   )
 
   // nearest users and event data of  user
   .get(
     '/nearest-users-events',
-    auth(USER_ROLE.SEEKER, USER_ROLE.GUIDE),
+    auth(USER_ROLE.SEEKER, USER_ROLE.GUIDE, USER_ROLE.ADMIN),
     userController.getNearestGuidesAndEvents,
   )
 
   .get("/isLookingForGuide", 
-    auth(USER_ROLE.SEEKER),
+    auth(USER_ROLE.SEEKER, USER_ROLE.ADMIN),
     userController.getIsLookingForGuide
   )
 
   .get("/isLookingGuideSeekers",
-    auth(USER_ROLE.GUIDE),
+    auth(USER_ROLE.GUIDE, USER_ROLE.ADMIN),
     userController.getIslookingGuideOfSeekers
   )
 
   .patch("/updateIsLookingForGuide",
-    auth(USER_ROLE.SEEKER),
+    auth(USER_ROLE.SEEKER, USER_ROLE.ADMIN),
     userController.updateIsLookingForGuide
   )
   // ============= [ dashboard routes access only admin start ] ==============

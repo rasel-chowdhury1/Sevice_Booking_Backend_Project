@@ -14,7 +14,7 @@ import httpStatus from 'http-status';
 const resendOtp = catchAsync(async (req: Request, res: Response) => {
   const token = req.headers?.token as string;
 
-  console.log({ token });
+
 
   await otpServices.resendOtpEmail({ token });
 

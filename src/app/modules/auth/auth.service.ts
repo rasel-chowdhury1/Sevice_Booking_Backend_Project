@@ -26,7 +26,7 @@ const client = twilio(accountSid, authToken);
 const login = async (payload: TLogin) => {
   const user = await User.isUserActive(payload?.email);
 
-  console.log("user -->>> ")
+
   if (!user) {
     throw new AppError(httpStatus.BAD_REQUEST, 'User not found');
   }
@@ -153,7 +153,6 @@ const forgotPasswordOtpMatch = async ({
   otp,
   token,
 }: OTPVerifyAndCreateUserProps) => {
-  console.log({ otp, token });
   if (!token) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Token not found');
   }
@@ -211,7 +210,6 @@ const resetPassword = async ({
   newPassword: string;
   confirmPassword: string;
 }) => {
-  console.log(newPassword, confirmPassword);
   if (newPassword !== confirmPassword) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Password does not match');
   }
@@ -261,7 +259,6 @@ const changePassword = async ({
   newPassword: string;
   oldPassword: string;
 }) => {
-  console.log({ userId, newPassword, oldPassword });
   const user = await User.IsUserExistById(userId);
 
   if (!user) {
