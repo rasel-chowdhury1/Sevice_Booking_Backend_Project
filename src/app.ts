@@ -36,7 +36,8 @@ const allowedOrigins = [
   'http://204.197.173.195:9000',
   'http://204.197.173.195:4173',
   'https://gydes.netlify.app',
-  'http://203.161.60.189:3010'
+  'http://203.161.60.189:3010',
+  "https://dashboard.gydes.app"
   // Add any other allowed origins here
 ];
 //parsers
