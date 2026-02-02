@@ -27,21 +27,27 @@ const createChat = async (payload: IChat) => {
     participants: { $all: payload.participants },
   }).populate(['participants']);
 
-
-
   if (alreadyExists) {
     return alreadyExists;
   }
 
-  const result = Chat.create(payload);
-
+  const result = await Chat.create(payload);
 
 
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Chat creation failed');
   }
-  return result;
+
+  // populate participants for the newly created chat
+  const populatedResult = await Chat.findById(result._id).populate(['participants']);
+
+
+
+
+  return populatedResult;
 };
+
+
 // =========== Create chat end ===========
 
 // =========== Get my chat list start ===========
@@ -140,11 +146,9 @@ const getMessagesByChatId = async (chatId: string) => {
       select: 'fullName email image role _id phoneNumber', // Select relevant fields of receiver
     });
 
-  if (!messages || messages.length === 0) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'No messages found for this chat');
-  }
+
   
-  return messages;
+  return messages || [];
 };
 
 // =========== Get message by ID start =============

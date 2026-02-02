@@ -33,7 +33,6 @@ const validateRequest = (schema: AnyZodObject) => {
       }
     }
 
-    console.log("=========after body data ============== >>>>>>>>>>", req.body)
 
     await schema.parseAsync({
       body: req.body,

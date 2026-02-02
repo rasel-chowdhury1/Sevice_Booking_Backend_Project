@@ -9,6 +9,7 @@ import httpStatus from 'http-status';
 const registerParticipant = async (userId: string, eventId: string) => {
      // 1️⃣ Validate if the event exists
      const event = await Event.findById(eventId);
+     
      if (!event) {
        throw new AppError(httpStatus.NOT_FOUND, "Event not found");
      }
