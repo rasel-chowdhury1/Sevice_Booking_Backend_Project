@@ -68,6 +68,32 @@ const deleteChat = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getOnlineUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await chatService.getOnlineUser(req.user.userId);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Online user retrieved successfully',
+    data: result,
+  });
+});
+
+const blockedChat = catchAsync(async (req: Request, res: Response) => {
+  const {userId} = req.user;
+  const {chatId} = req.params
+
+  console.log("chat id ===>>> ",chatId);
+  console.log("user id ===>>> ",userId);
+  const result = await chatService.blockedChat(userId, chatId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Chat blocked successfully',
+    data: result,
+  });
+});
+
 export const chatController = {
   createChat,
   getMyChatList,
@@ -75,4 +101,6 @@ export const chatController = {
   getMessageByChatId,
   updateChat,
   deleteChat,
+  getOnlineUser,
+  blockedChat
 };

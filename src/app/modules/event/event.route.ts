@@ -25,6 +25,12 @@ eventRoutes.post(
   eventController.createEvent,
 );
 
+eventRoutes.patch(
+  "/block/:eventId",
+  auth(USER_ROLE.SEEKER, USER_ROLE.ADMIN, USER_ROLE.GUIDE),
+  eventController.blockEvent
+)
+
 // Update event route
 eventRoutes.patch(
   '/:eventId/update',

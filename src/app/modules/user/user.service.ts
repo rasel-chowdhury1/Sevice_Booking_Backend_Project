@@ -14,6 +14,7 @@ import { DeleteAccountPayload, TUser, TUserCreate } from './user.interface';
 import { User } from './user.models';
 import Booking from '../booking/booking.model';
 import { verifiedUserNotify } from '../../../socketio';
+import { Types } from 'mongoose';
 const supportEmail = config.support_email;
 const supportPhone = config.support_phone;
 
@@ -1048,6 +1049,60 @@ const changeRole = async (user_id: string, role: string) => {
 };
 
 
+const blockUserService = async (
+  userId: string,
+  blockedUserId: string
+) => {
+  if (!Types.ObjectId.isValid(userId) || !Types.ObjectId.isValid(blockedUserId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid user id");
+  }
+
+  if (userId === blockedUserId) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "You cannot block yourself"
+    );
+  }
+
+  const blockedUserExists = await User.exists({ _id: blockedUserId });
+  if (!blockedUserExists) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { $addToSet: { blockedUsers: blockedUserId } }, // prevent duplicates
+    { new: true }
+  );
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  return user;
+};
+
+const unblockUserService = async (
+  userId: string,
+  blockedUserId: string
+) => {
+  if (!Types.ObjectId.isValid(userId) || !Types.ObjectId.isValid(blockedUserId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid user id");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { $pull: { blockedUsers: blockedUserId } },
+    { new: true }
+  );
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  return user;
+};
+
 export const userService = {
   createUserToken,
   otpVerifyAndCreateUser,
@@ -1070,5 +1125,7 @@ export const userService = {
   getYearlyUserOverview,
   getIslookingGuideOfSeekers,
   getUserWallet,
-  changeRole
+  changeRole,
+  blockUserService,
+  unblockUserService
 };

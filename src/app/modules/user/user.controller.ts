@@ -534,6 +534,33 @@ const changeRole = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const blockUserService = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = req?.user;
+  const { id } = req.params;
+  const result = await userService.blockUserService(userId, id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User blocked successfully',
+    data: result,
+  });
+})
+
+
+const unBlockUserService = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = req?.user;
+  const { id } = req.params;
+  const result = await userService.unblockUserService(userId, id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User unblocked successfully',
+    data: result,
+  });
+
+})
+
 export const userController = {
   createUser,
   getNearestGuidesAndEvents,
@@ -561,5 +588,7 @@ export const userController = {
   getUserWallet,
   blockUserByAdmin,
   unBlockUserByAdmin,
-  changeRole
+  changeRole,
+  blockUserService,
+  unBlockUserService
 };

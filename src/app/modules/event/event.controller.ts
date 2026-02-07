@@ -78,12 +78,14 @@ const getNearestEvents = catchAsync(async (req: Request, res: Response) => {
     const data: { latitude?: number, longitude?: number } = {};
   
     // If lat and long are provided, convert them to numbers and assign to data
-    // if (lat && long) {
-    //   data.latitude = parseFloat(lat as string);
-    //   data.longitude = parseFloat(long as string);
-    // }
+    if (lat && long) {
+      data.latitude = parseFloat(lat as string);
+      data.longitude = parseFloat(long as string);
+    }
   
     const result = await eventService.getNearestEvents(userId, data);
+
+
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -232,6 +234,21 @@ const deleteEvent = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+const blockEvent = catchAsync(async (req: Request, res: Response) => {
+  const { eventId } = req.params;
+  const { userId } = req.user;
+
+  const result = await eventService.blockEvent(eventId, userId);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "User blocked successfully for this event",
+    data: result,
+  });
+});
+
+
 
 
 export const eventController = {
@@ -243,5 +260,6 @@ export const eventController = {
   updateEvent,
   getAllEvents,
   getEventById,
-  deleteEvent
+  deleteEvent,
+  blockEvent
 };

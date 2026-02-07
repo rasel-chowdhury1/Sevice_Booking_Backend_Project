@@ -17,6 +17,16 @@ router.get(
   chatController.getMyChatList,
 );
 
+router.get(
+  "/online-user",
+  auth(
+    USER_ROLE.ADMIN,  
+    USER_ROLE.SEEKER,
+    USER_ROLE.GUIDE
+  ),
+  chatController.getOnlineUser
+)
+
 
 router.get(
   '/:id',
@@ -38,6 +48,16 @@ router.post(
   validateRequest(chatValidation.createChatValidation),
   chatController.createChat,
 );
+
+router.post(
+  "/blocked/:chatId",
+  auth(
+    USER_ROLE.ADMIN,  
+    USER_ROLE.SEEKER,
+    USER_ROLE.GUIDE
+  ),
+  chatController.blockedChat
+)
 
 router.patch(
   '/:id',

@@ -26,6 +26,9 @@ const imagesDir = path.join(__dirname, 'uploads'); // Local storage for images
 
 let io: SocketIOServer;
 
+  // Online users
+  export const onlineUser = new Set();
+
 const initializeSocketIO = (server: HttpServer) => {
    io = new Server(server, {
     cors: {
@@ -33,8 +36,7 @@ const initializeSocketIO = (server: HttpServer) => {
     },
   });
 
-  // Online users
-  const onlineUser = new Set();
+
 
   // middleware to authenticate the socket connection
   io.use(socketAuthMiddleware);
@@ -51,7 +53,7 @@ const initializeSocketIO = (server: HttpServer) => {
       // //----------------------check Token and return user details-------------------------//
       //   const user: any = await getUserDetailsFromToken(token);
 
-      const user: any = (socket as any)?.decodedToken;
+      const                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   user: any = (socket as any)?.decodedToken;
 
 
 
@@ -69,6 +71,8 @@ const initializeSocketIO = (server: HttpServer) => {
 
       //----------------------online array send for front end------------------------//
       io.emit('onlineUser', Array.from(onlineUser));
+
+      console.log("==== online user =>>>> ", onlineUser);
 
       // ===================== join by user id ================================
       // socket.join(user?._id?.toString());
@@ -508,9 +512,9 @@ const initializeSocketIO = (server: HttpServer) => {
 
       //-----------------------Disconnect functionlity start ------------------------//
       socket.on('disconnect', () => {
-        onlineUser.delete(user?._id?.toString());
+
+        onlineUser.delete(user?.userId?.toString());
         io.emit('onlineUser', Array.from(onlineUser));
-        console.log('disconnect user ', socket.id);
       });
       //-----------------------Disconnect functionlity end ------------------------//
     } catch (error) {
@@ -519,6 +523,7 @@ const initializeSocketIO = (server: HttpServer) => {
       //-----------------------Disconnect functionlity start ------------------------//
       socket.on('disconnect', () => {
         console.log('disconnect user ', error);
+        console.log("==== online user 2 =>>>> ", onlineUser);
       });
       //-----------------------Disconnect functionlity end ------------------------//
     }

@@ -1,6 +1,6 @@
 import { unlink } from 'fs/promises';
 import httpStatus from 'http-status';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/AppError';
 import { User } from '../user/user.models';
@@ -67,6 +67,8 @@ const getNearestEvents = async (userId: string, currentLocation?: { latitude?: n
       throw new AppError(httpStatus.NOT_FOUND, 'User not found');
     }
 
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
     // // 2️⃣ Extract user location
     // const { location } = user;
 
@@ -119,6 +121,13 @@ const getNearestEvents = async (userId: string, currentLocation?: { latitude?: n
           distanceField: 'distance',
           maxDistance: 30000, // ✅ 30km max distance filter
           spherical: true,
+        },
+      },
+
+       // ❌ Exclude blocked events
+      {
+        $match: {
+          blockedUsers: { $ne: userObjectId },
         },
       },
 
@@ -290,6 +299,7 @@ const getFeatureEventsForUser = async (userId: string) => {
           date: { $gte: new Date() }, // Event date is today or in the future
           isDeleted: { $ne: true }, // Exclude deleted events
           status: { $ne: 'cancelled' }, // Exclude cancelled events
+          blockedUsers: { $ne: new mongoose.Types.ObjectId(userId) }
         },
       },
       {
@@ -526,6 +536,34 @@ const deleteEvent = async (user_id: string, eventId: string, role: string): Prom
   }
 };
 
+
+const blockEvent = async (
+  eventId: string,
+  userId: string
+) => {
+  if (!Types.ObjectId.isValid(eventId)) {
+    throw new Error("Invalid eventId");
+  }
+
+  if (!Types.ObjectId.isValid(userId)) {
+    throw new Error("Invalid userId");
+  }
+
+  const updatedEvent = await Event.findByIdAndUpdate(
+    eventId,
+    {
+      $addToSet: { blockedUsers: userId }, // 👈 no duplicate userIds
+    },
+    { new: true }
+  );
+
+  if (!updatedEvent) {
+    throw new Error("Event not found");
+  }
+
+  return updatedEvent;
+};
+
 export const eventService = {
   createEvent,
   getNearestEvents,
@@ -536,4 +574,5 @@ export const eventService = {
   getAllEvents,
   getEventById,
   deleteEvent,
+  blockEvent
 };

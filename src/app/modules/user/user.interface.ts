@@ -57,7 +57,7 @@ export interface TUserCreate {
   isLookingGuide: boolean;
   deletePhotos?: string[]
   wallet: IWallet;
-
+  blockedUsers?: Schema.Types.ObjectId[];
 }
 
 export interface TUser extends TUserCreate {

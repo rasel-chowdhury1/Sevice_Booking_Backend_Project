@@ -32,4 +32,5 @@ export interface IEvent extends Document {
   isDeleted: boolean;
   createdAt: Date; // Automatically added by Mongoose
   updatedAt: Date; // Automatically added by Mongoose
+  blockedUsers?: ObjectId[];
 }

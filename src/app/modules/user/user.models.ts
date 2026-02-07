@@ -185,6 +185,14 @@ const userSchema = new Schema<TUser>(
         },
       ],
     },
+    // ✅ Users this user has blocked
+    blockedUsers: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        default: [],
+      },
+    ],
   },
   {
     timestamps: true,

@@ -5,6 +5,9 @@ import { User } from '../user/user.models';
 import Chat from './chat.model';
 import Message from '../message/message.model';
 import { deleteFromS3 } from '../../utils/s3';
+import { userController } from '../user/user.controller';
+import { onlineUser } from '../../../socketio';
+import mongoose from 'mongoose';
 
 // =========== Create chat start ===========
 const createChat = async (payload: IChat) => {
@@ -56,7 +59,7 @@ const getMyChatList = async (userId: string, query: any) => {
 
 
   // Build the query object to filter the chats
-  const filterQuery: any = { participants: { $all: userId } };
+  const filterQuery: any = { participants: { $all: userId }, status: { $ne: 'blocked' } };
   
 
 
@@ -117,6 +120,8 @@ const getMyChatList = async (userId: string, query: any) => {
 
   return data ;
 };
+
+
 // =========== Get my chat list end ===========
 
 // =========== Get chat by ID start =============
@@ -163,6 +168,34 @@ const updateChatList = async (id: string, payload: Partial<IChat>) => {
   };
 // =========== Update chat list end =============
 
+
+
+// ========= get online users =======
+const getOnlineUser = async (userId: string) => {
+  // 1️⃣ আমার যেসব chat আছে
+  const chats = await Chat.find({
+    participants: userId,
+  }).select('participants');
+
+  const onlineFriends = new Set<string>();
+
+  // 2️⃣ প্রতিটা chat থেকে friend বের করা
+  for (const chat of chats) {
+    const friendId = chat.participants.find(
+      (id: any) => id.toString() !== userId
+    );
+
+    // 3️⃣ friend online কিনা check করা
+    if (friendId && onlineUser.has(friendId.toString())) {
+      onlineFriends.add(friendId.toString());
+    }
+  }
+
+  // 4️⃣ frontend compatible format
+  return Array.from(onlineFriends);
+};
+
+
 // =========== Delete chat list start =============
 const deleteChatList = async (id: string) => {
     await deleteFromS3(`images/messages/${id}`);
@@ -175,6 +208,37 @@ const deleteChatList = async (id: string) => {
 // =========== Delete chat list end =============
 
 
+const blockedChat = async (userId: string, chatId: string) => {
+  // 1️⃣ Validate ObjectIds
+  if (
+    !mongoose.Types.ObjectId.isValid(userId) ||
+    !mongoose.Types.ObjectId.isValid(chatId)
+  ) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid id');
+  }
+
+  const userObjectId = new mongoose.Types.ObjectId(userId);
+
+  // 2️⃣ Find chat where user is a participant
+  const chat = await Chat.findOne({
+    _id: chatId,
+    participants: userObjectId,
+  });
+
+  if (!chat) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'You are not a participant of this chat',
+    );
+  }
+
+  // 3️⃣ Block the chat
+  chat.status = 'blocked';
+  await chat.save();
+
+  return chat;
+};
+
 
 
 
@@ -186,4 +250,6 @@ export const chatService = {
   getMessagesByChatId,
   updateChatList,
   deleteChatList,
+  getOnlineUser,
+  blockedChat
 };

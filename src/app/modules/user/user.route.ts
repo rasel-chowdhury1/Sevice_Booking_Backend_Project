@@ -138,7 +138,17 @@ userRoutes
   .get('/:id', userController.getUserById)
 
 
+  .post(
+    "/block-user/:id",
+    auth(USER_ROLE.ADMIN, USER_ROLE.SEEKER, USER_ROLE.GUIDE),
+    userController.blockUserService
+  )
 
+  .post(
+    "/unblock-user/:id",
+    auth(USER_ROLE.ADMIN, USER_ROLE.SEEKER, USER_ROLE.GUIDE),
+    userController.unBlockUserService
+  )
 
   .put('/block/:id', auth(USER_ROLE.ADMIN), userController.blockedUser)
 
