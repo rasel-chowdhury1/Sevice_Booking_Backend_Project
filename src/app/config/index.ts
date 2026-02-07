@@ -17,6 +17,14 @@ const stripe = {
 };
 // const port = 9010
 
+
+const smtp = {
+  host: process.env.NODEMAILER_HOST,
+  user: process.env.NODEMAILER_HOST_EMAIL,
+  pass: process.env.NODEMAILER_HOST_PASS,
+  fromName: process.env.NODEMAILER_FROM_NAME,
+}
+
 export default {
   NODE_ENV: process.env.NODE_ENV,
   port: process.env.PORT,
@@ -46,6 +54,7 @@ export default {
   stripe_key: process.env.STRIPE_API_KEY,
   aws,
   stripe,
+  smtp,
   paypal_client_id: process.env.PAYPAL_CLIENT_ID,
   paypal_client_secret: process.env.PAYPAL_CLIENT_SECRET
 };

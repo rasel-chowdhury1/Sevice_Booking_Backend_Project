@@ -1,16 +1,17 @@
 import nodemailer from 'nodemailer';
 import config from '../config';
 
+
+const isProduction = process.env.NODE_ENV === 'production';
 export const sendEmail = async (to: string, subject: string, html: string) => {
  
   const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: config.NODE_ENV === 'production',
+    host: config.smtp.host,
+    port: isProduction ? 465 : 587,
+    secure: isProduction,
     auth: {
-      // TODO: replace `user` and `pass` values from <https://forwardemail.net>
-      user: config.nodemailer_host_email,
-      pass: config.nodemailer_host_pass,
+      user: config.smtp.user,        // webmail email
+      pass: config.smtp.pass   // SMTP/webmail password
     },
   });
 
@@ -20,10 +21,9 @@ export const sendEmail = async (to: string, subject: string, html: string) => {
   try {
      console.log('mail send started');
     await transporter.sendMail({
-      from: 'team.robust.dev@gmail.com', // sender address
+      from: `"${config.smtp.fromName}" <${config.smtp.user}>`, // sender address
       to, // list of receivers
       subject,
-      text: '', // plain text body
       html, // html body
     });
     
